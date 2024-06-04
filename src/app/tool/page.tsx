@@ -1,7 +1,7 @@
 export default function Home() {
     return (
       <div>
-        Tools endpoint
+        Tool endpoint
       </div>
     );
   }

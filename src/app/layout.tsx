@@ -1,20 +1,19 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import "./globals.css";
-
-import '@mantine/core/styles.css';
-import { MantineProvider, ColorSchemeScript, createTheme } from '@mantine/core';
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "OptiBet companion",
   description: "The bet companion",
-}
+};
 
-const theme = createTheme({
-  /** Put your mantine theme override here */
-});
+import "./global.css";
+import "@mantine/core/styles.css";
+import React from "react";
+import { MantineProvider, ColorSchemeScript } from "@mantine/core";
+import { theme } from "../../theme";
+
 
 export default function RootLayout({ children }: { children: any }) {
   return (
