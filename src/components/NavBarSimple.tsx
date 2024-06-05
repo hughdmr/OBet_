@@ -3,11 +3,10 @@
 import { useState } from 'react';
 import {
   IconBellRinging,
-  IconFingerprint,
-  IconKey,
+  IconHome,
+  IconWallet,
   IconSettings,
-  Icon2fa,
-  IconDatabaseImport,
+  IconTools,
   IconReceipt2
 } from '@tabler/icons-react';
 
@@ -15,13 +14,13 @@ import classes from './NavbarSimple.module.css';
 import { UserButton } from '@/components/UserButton';
 
 const data = [
+
+  { link: '', label: 'Dashboard', icon: IconHome },
+  { link: '', label: 'Bankroll', icon: IconWallet },
+  { link: '', label: 'Tools', icon: IconTools },
   { link: '', label: 'Notifications', icon: IconBellRinging },
   { link: '', label: 'Billing', icon: IconReceipt2 },
-  { link: '', label: 'Security', icon: IconFingerprint },
-  { link: '', label: 'SSH Keys', icon: IconKey },
-  { link: '', label: 'Databases', icon: IconDatabaseImport },
-  { link: '', label: 'Authentication', icon: Icon2fa },
-  { link: '', label: 'Other Settings', icon: IconSettings },
+  { link: '', label: 'Settings', icon: IconSettings },
 ];
 
 export function NavbarSimple() {
