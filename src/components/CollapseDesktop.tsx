@@ -1,8 +1,7 @@
 "use client"
 
-import { AppShell, Burger, Group, Skeleton } from '@mantine/core';
+import { AppShell, Burger, Group } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { MantineLogo } from '@mantinex/mantine-logo';
 import Image from 'next/image';
 import "../../public/optibet-logo.png" 
 import { NavbarSimple } from './NavBarSimple';

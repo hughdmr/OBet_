@@ -15,16 +15,16 @@ import { UserButton } from '@/components/UserButton';
 
 const data = [
 
-  { link: '', label: 'Dashboard', icon: IconHome },
-  { link: '', label: 'Bankroll', icon: IconWallet },
-  { link: '', label: 'Tools', icon: IconTools },
+  { link: '/dashboard', label: 'Dashboard', icon: IconHome },
+  { link: '/bankroll', label: 'Bankroll', icon: IconWallet },
+  { link: '/tool', label: 'Tools', icon: IconTools },
   { link: '', label: 'Notifications', icon: IconBellRinging },
   { link: '', label: 'Billing', icon: IconReceipt2 },
-  { link: '', label: 'Settings', icon: IconSettings },
+  { link: '/profile', label: 'Settings', icon: IconSettings },
 ];
 
 export function NavbarSimple() {
-  const [active, setActive] = useState('Billing');
+  const [active, setActive] = useState(window.localStorage.getItem("active"));
 
   const links = data.map((item) => (
     <a
@@ -33,8 +33,9 @@ export function NavbarSimple() {
       href={item.link}
       key={item.label}
       onClick={(event) => {
-        event.preventDefault();
+        // event.preventDefault();
         setActive(item.label);
+        window.localStorage.setItem("active", item.label)
       }}
     >
       <item.icon className={classes.linkIcon} stroke={1.5} />
