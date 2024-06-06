@@ -1,5 +1,6 @@
 "use client"
 
+import Link from 'next/link';
 import { useState } from 'react';
 import {
   IconBellRinging,
@@ -24,23 +25,21 @@ const data = [
 ];
 
 export function NavbarSimple() {
-  const [active, setActive] = useState(window.localStorage.getItem("active"));
+  const [active, setActive] = useState("Dashboard");
 
   const links = data.map((item) => (
-    <a
+    <Link
       className={classes.link}
       data-active={item.label === active || undefined}
       href={item.link}
       key={item.label}
       onClick={(event) => {
-        // event.preventDefault();
         setActive(item.label);
-        window.localStorage.setItem("active", item.label)
       }}
     >
       <item.icon className={classes.linkIcon} stroke={1.5} />
       <span>{item.label}</span>
-    </a>
+    </Link>
   ));
 
   return (
