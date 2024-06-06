@@ -1,7 +1,10 @@
+import { BadgeCard } from '../../components/BadgeCard';
+
 export default function Home() {
     return (
       <div>
         Tool endpoint
-      </div>
+        <BadgeCard/>
+    </div>
     );
   }
