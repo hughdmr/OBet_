@@ -1,12 +1,30 @@
+.container {
+  display: flex;
+  gap: 20px; /* Espace entre les cartes */
+  justify-content: center; /* Centrer les cartes horizontalement */
+  flex-wrap: wrap; /* Permet de passer à la ligne si l'espace est insuffisant */
+}
+
 .card {
     background-color: light-dark(var(--mantine-color-white), var(--mantine-color-dark-7));
+    width: 300px; /* Ajuster la largeur des cartes */
+    margin-bottom: 20px; /* Espace en bas des cartes pour le flex-wrap */
   }
   
-  .section {
+  .section_description {
     border-bottom: rem(1px) solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
     padding-left: var(--mantine-spacing-md);
     padding-right: var(--mantine-spacing-md);
     padding-bottom: var(--mantine-spacing-md);
+    height: 100%; /* Pousse cette section vers le bas */
+  }
+
+  .section_label {
+    border-bottom: rem(1px) solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
+    padding-left: var(--mantine-spacing-md);
+    padding-right: var(--mantine-spacing-md);
+    padding-bottom: var(--mantine-spacing-md);
+    margin-top: auto; /* Pousse cette section vers le bas */
   }
   
   .like {

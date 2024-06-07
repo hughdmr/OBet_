@@ -1,10 +1,11 @@
-import { BadgeCard } from '../../components/BadgeCard';
+import { ValueCard, SwissKnifeCard } from '../../components/BadgeCard';
+import classes from '../../components/BadgeCard.module.css';
 
 export default function Home() {
     return (
-      <div>
-        <BadgeCard/>
-        <BadgeCard/>
+      <div className={classes.container}>
+        <ValueCard/>
+        <SwissKnifeCard/>
     </div>
     );
   }
