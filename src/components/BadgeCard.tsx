@@ -48,7 +48,7 @@ export function ValueCard() {
 
       <Card.Section className={classes.section_label}>
         <Text mt="md" className={classes.label} c="dimmed">
-          The only principle to OPTI-mize BET-ting and win in betting.
+          The only principle to optibet and win.
         </Text>
         <Group gap={7} mt={5}>
           {features}
@@ -69,7 +69,7 @@ export function ValueCard() {
 
 // 2e carte : optimisation de défis
 
-const mockdata_swiss = {
+const mockdata_surebet = {
     image:
       'https://www.petitegravure.com/1325-large_default/couteau-suisse-victorinox-explorer-personnalise.webp',
     title: 'Surebet Calculator',
@@ -83,8 +83,8 @@ const mockdata_swiss = {
     ],
   };
 
-export function SwissKnifeCard() {
-    const { image, title, description, country, badges } = mockdata_swiss;
+export function SurebetCard() {
+    const { image, title, description, country, badges } = mockdata_surebet;
     const features = badges.map((badge) => (
       <Badge variant="light" key={badge.label} leftSection={badge.emoji}>
         {badge.label}
@@ -113,7 +113,7 @@ export function SwissKnifeCard() {
   
         <Card.Section className={classes.section_label}>
           <Text mt="md" className={classes.label} c="dimmed">
-            The Swiss knife to OPTI-mize BET-ting and win in betting.
+            The Swiss knife to optibet and win.
           </Text>
           <Group gap={7} mt={5}>
             {features}
