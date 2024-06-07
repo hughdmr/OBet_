@@ -19,8 +19,6 @@ const data = [
   { link: '/dashboard', label: 'Dashboard', icon: IconHome },
   { link: '/bankroll', label: 'Bankroll', icon: IconWallet },
   { link: '/tool', label: 'Tools', icon: IconTools },
-  { link: '', label: 'Notifications', icon: IconBellRinging },
-  { link: '', label: 'Billing', icon: IconReceipt2 },
   { link: '/profile', label: 'Settings', icon: IconSettings },
 ];
 
