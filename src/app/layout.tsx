@@ -1,4 +1,5 @@
 import "./global.css";
+import '@mantine/charts/styles.css';
 import "@mantine/core/styles.css";
 import React from "react";
 
