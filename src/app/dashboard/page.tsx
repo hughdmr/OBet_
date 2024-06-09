@@ -1,7 +1,11 @@
+import { GraphBarGrid, GraphDonutGrid, StatsGrid } from "@/components/StatsGrid";
+
 export default function Home() {
     return (
       <div>
-        Dashboard endpoint
+        <StatsGrid />
+        <GraphDonutGrid />
+        <GraphBarGrid />
       </div>
     );
   }
