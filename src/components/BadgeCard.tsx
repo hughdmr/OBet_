@@ -1,5 +1,7 @@
 "use client"
 
+import Link from 'next/link';
+import { useState } from 'react';
 import { IconHeart } from '@tabler/icons-react';
 import { Card, Image, Text, Group, Badge, Button, ActionIcon } from '@mantine/core';
 import classes from './BadgeCard.module.css';
@@ -18,8 +20,26 @@ const mockdata_value = {
   ],
 };
 
+const linksdata = [
+    { link: '/tool/value', label: 'Show details' },
+]
+
 export function ValueCard() {
+  const [active, setActive] = useState("Tool");
   const { image, title, description, country, badges } = mockdata_value;
+  const links = linksdata.map((item) => (
+    <Link
+      className={classes.link}
+      data-active={item.label === active || undefined}
+      href={item.link}
+      key={item.label}
+      onClick={(event) => {
+        setActive(item.label);
+      }}>
+      <span>{item.label}</span>
+    </Link>
+  ));
+
   const features = badges.map((badge) => (
     <Badge variant="light" key={badge.label} leftSection={badge.emoji}>
       {badge.label}
@@ -57,7 +77,8 @@ export function ValueCard() {
 
       <Group mt="xs">
         <Button radius="md" style={{ flex: 1 }}>
-          Show details
+          {links}
+          {/* Show details */}
         </Button>
         <ActionIcon variant="default" radius="md" size={36}>
           <IconHeart className={classes.like} stroke={1.5} />
@@ -150,6 +171,67 @@ const mockdata_freebet = {
   };
 
 export function FreebetCard() {
+    const { image, title, description, country, badges } = mockdata_freebet;
+    const features = badges.map((badge) => (
+      <Badge variant="light" key={badge.label} leftSection={badge.emoji}>
+        {badge.label}
+      </Badge>
+    ));
+  
+    return (
+      <Card withBorder radius="md" p="md" className={classes.card}>
+        <Card.Section>
+          <Image src={image} alt={title} height={180} />
+        </Card.Section>
+  
+        <Card.Section className={classes.section_description} mt="md">
+          <Group justify="apart">
+            <Text fz="lg" fw={500}>
+              {title}
+            </Text>
+            <Badge size="sm" variant="light">
+              {country}
+            </Badge>
+          </Group>
+          <Text fz="sm" mt="xs">
+            {description}
+          </Text>
+        </Card.Section>
+  
+        <Card.Section className={classes.section_label}>
+          <Text mt="md" className={classes.label} c="dimmed">
+            The essential to optibet and win.
+          </Text>
+          <Group gap={7} mt={5}>
+            {features}
+          </Group>
+        </Card.Section>
+  
+        <Group mt="xs">
+          <Button radius="md" style={{ flex: 1 }}>
+            Show details
+          </Button>
+          <ActionIcon variant="default" radius="md" size={36}>
+            <IconHeart className={classes.like} stroke={1.5} />
+          </ActionIcon>
+        </Group>
+      </Card>
+    );
+  }
+
+
+type mockdatatype = {
+    image: string,
+    title: string,
+    description: string,
+    country: string,
+    badges: {
+        emoji: string,
+        label: string,
+    },
+}
+
+  export function TemplateCard({mockdata}: {mockdata: mockdatatype}) {
     const { image, title, description, country, badges } = mockdata_freebet;
     const features = badges.map((badge) => (
       <Badge variant="light" key={badge.label} leftSection={badge.emoji}>
