@@ -11,7 +11,7 @@ import {
   IconReceipt2
 } from '@tabler/icons-react';
 
-import classes from './navbarSimple.module.css';
+import classes from './NavBarSimple.module.css';
 import { UserButton } from '@/components/UserButton';
 
 const data = [
