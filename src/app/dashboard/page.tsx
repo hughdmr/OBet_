@@ -1,11 +1,12 @@
-import { GraphBarGrid, GraphDonutGrid, StatsGrid } from "@/components/StatsGrid";
+import { BetGrid, CapitalGrid, GraphDonutGrid, HorizontalStatsGrid } from "@/components/StatsGrid";
 
 export default function Home() {
     return (
       <div>
-        <StatsGrid />
+        <HorizontalStatsGrid />
         <GraphDonutGrid />
-        <GraphBarGrid />
+        <BetGrid />
+        <CapitalGrid />
       </div>
     );
   }

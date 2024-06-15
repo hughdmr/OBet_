@@ -1,10 +1,14 @@
 .root {
-  padding: calc(var(--mantine-spacing-xl) * 1.5);
+  padding: calc(var(--mantine-spacing-sm) * 1.5);
   padding-bottom: 0;
 }
 
+.verticalroot {
+  padding: 0
+}
+
 .value {
-  font-size: rem(24px);
+  font-size: rem(40px);
   font-weight: 700;
   line-height: 1;
 }
