@@ -15,13 +15,13 @@ type mockdatatype = {
     badges: {
         emoji: string,
         label: string,
-    },
+    }[],
     devise: string,
     link: string,
     label: string,
 }
 
-export function TemplateCard(mockdata: mockdatatype) {
+export function TemplateCard({mockdata}: {mockdata: mockdatatype}) {
     const {parent, image, title, description, country, badges, devise, link, label } = mockdata;
     const [active, setActive] = useState(parent);
     // const links = linksdata.map((item) => (
@@ -105,7 +105,7 @@ export function ValueCard() {
       };
 
   return (
-    TemplateCard(mockdata_value)
+    <TemplateCard mockdata={mockdata_value} />
   )
 }
 
@@ -131,7 +131,7 @@ export function SurebetCard() {
       };
 
     return (
-    TemplateCard(mockdata_surebet)
+      <TemplateCard mockdata={mockdata_surebet} />
     )
 }
 
@@ -158,6 +158,6 @@ export function FreebetCard() {
       };
 
     return (
-    TemplateCard(mockdata_freebet)
+      <TemplateCard mockdata={mockdata_freebet} />
     )
 }
