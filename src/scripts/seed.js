@@ -1,5 +1,7 @@
+"use server";
+
 import { db } from '@vercel/postgres';
-import { users, bets } from './placeholder-data.js';
+import { users } from './placeholder-data.js';
 import bcrypt from 'bcrypt';
 
 async function seedUsers(client) {
@@ -41,7 +43,7 @@ async function seedUsers(client) {
   }
 }
 
-async function seedBets(client) {
+async function seedBets(client, bets) {
   try {
     await client.sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
 
@@ -66,7 +68,7 @@ async function seedBets(client) {
       bets.map(
         (bet) => client.sql`
         INSERT INTO bets (user_id, date, team1, team2, amount, cote, status)
-        VALUES (${bet.user_id}, ${bet.date}, ${bet.team1}, ${bet.team2}, ${bet.amount}, ${bet.cote}, ${bet.status})
+        VALUES (${'410544b2-4001-4271-9855-fec4b6a6442a'}, ${bet.date}, ${bet.team1}, ${bet.team2}, ${bet.amount}, ${bet.cote}, ${bet.status})
         ON CONFLICT (id) DO NOTHING;
       `,
       ),
@@ -84,6 +86,12 @@ async function seedBets(client) {
   }
 }
 
+export async function addBets(bets) {
+  const client = await db.connect();
+  await seedBets(client, bets);
+  await client.end();
+}
+
 async function main() {
   const client = await db.connect();
 
@@ -93,9 +101,9 @@ async function main() {
   await client.end();
 }
 
-main().catch((err) => {
-  console.error(
-    'An error occurred while attempting to seed the database:',
-    err,
-  );
-});
+// main().catch((err) => {
+//   console.error(
+//     'An error occurred while attempting to seed the database:',
+//     err,
+//   );
+// });
