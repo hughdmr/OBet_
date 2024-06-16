@@ -3,12 +3,15 @@ import { ChartData } from "@/components/Chart";
 import { BankrollTable } from "@/components/BankrollTable";
 import { BetForm } from "@/components/BetForm";
 
-export default function Home() {
+import { fetchBets, fetchFilteredBets } from '@/scripts/data';
+
+export default async function Home() {
+    const bets = await fetchBets();
     return (
       <div className="bankroll-container">
         <ChartData />
         <BetForm />
-        <BankrollTable />
+        <BankrollTable elements={bets}/>
       </div>
     );
   }
