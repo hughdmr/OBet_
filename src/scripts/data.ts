@@ -1,4 +1,5 @@
 import { sql } from '@vercel/postgres';
+import { unstable_noStore as noStore } from 'next/cache';
 import { User, TableBet } from './definitions'
 
 const formatCurrency = (amount: number) => {
@@ -10,7 +11,7 @@ const formatCurrency = (amount: number) => {
 
 export async function fetchUsers() {
   // Add noStore() here to prevent the response from being cached.
-  // This is equivalent to in fetch(..., {cache: 'no-store'}).
+  noStore()
 
   try {
     const data = await sql<User>`SELECT * FROM users`;
@@ -22,9 +23,10 @@ export async function fetchUsers() {
 }
 
 export async function fetchBets() {
+  noStore()
   try {
     const data = await sql<TableBet>`
-      SELECT bets.id, bets.date, bets.team1, bets.team2, bets.amount, bets.cote, bets.status, users.id
+      SELECT bets.id, bets.date, bets.team1, bets.team2, bets.amount, bets.cote, bets.status
       FROM bets
       JOIN users ON bets.user_id = users.id
       ORDER BY bets.date DESC
@@ -40,9 +42,11 @@ export async function fetchBets() {
     console.error('Database Error:', error);
     throw new Error('Failed to fetch the latest bets.');
   }
+  
 }
 
 export async function fetchFilteredBets(query: string) {
+  noStore()
   try {
     const data = await sql<TableBet>`
       SELECT

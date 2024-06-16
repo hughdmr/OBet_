@@ -3,6 +3,7 @@
 import { db } from '@vercel/postgres';
 import { users } from './placeholder-data.js';
 import bcrypt from 'bcrypt';
+import { revalidatePath } from 'next/cache';
 
 async function seedUsers(client) {
   try {
@@ -75,6 +76,8 @@ async function seedBets(client, bets) {
     );
 
     console.log(`Seeded ${insertedBets.length} bets`);
+
+    revalidatePath('/bankroll');
 
     return {
       createTable,
