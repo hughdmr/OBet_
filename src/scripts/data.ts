@@ -28,11 +28,11 @@ export async function fetchBets() {
       FROM bets
       JOIN users ON bets.user_id = users.id
       ORDER BY bets.date DESC
-      LIMIT 5`;
+      LIMIT 25`;
 
     const latestBets = data.rows.map((bet) => ({
       ...bet,
-      date: bet.date.toString(),
+      date: bet.date.toLocaleDateString().toString(),
       amount: formatCurrency(bet.amount),
     }));
     return latestBets;
@@ -68,7 +68,7 @@ export async function fetchFilteredBets(query: string) {
 
     const bets = data.rows.map((bet) => ({
         ...bet,
-        date: bet.date.toString(),
+        date: bet.date.toLocaleDateString().toString(),
         amount: formatCurrency(bet.amount),
       }));
     return bets;

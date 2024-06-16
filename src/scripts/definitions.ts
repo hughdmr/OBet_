@@ -11,7 +11,7 @@ export type User = {
   export type TableBet = {
     id: string;
     user_id: string;
-    date: string;
+    date: Date;
     team1: string;
     team2: string;
     amount: number;
