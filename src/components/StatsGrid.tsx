@@ -67,7 +67,7 @@ export function DataBox({stat}:{stat:DataType}) {
         <Icon className={classes.icon} size="1.4rem" stroke={1.5} />
       </Group>
 
-      <Group align="flex-end" gap="xs" mt={45}>
+      <Group align="baseline" gap="xs" mt={45}>
         <Text className={classes.value}>{stat.value}</Text>
         <Text c={stat.diff > 0 ? 'teal' : 'red'} fz="md" fw={500} className={classes.diff}>
           <span className={classes.test}>{stat.diff}%</span>
