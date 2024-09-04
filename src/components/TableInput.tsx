@@ -1,29 +1,26 @@
-"use client"
-
 import cx from 'clsx';
 import { useState } from 'react';
-import { Table, Checkbox, ScrollArea, Group, Avatar, Text, rem } from '@mantine/core';
+import { Table, Checkbox, ScrollArea, rem } from '@mantine/core';
 import classes from './TableInput.module.css';
 
-const data = [
-  {
-    id: '1',
-    odd1: '2',
-    odd2: '2',
-  },
-  {
-    id: '2',
-    odd1: '1.5',
-    odd2: '3',
-  },
-];
+interface TableInputProps {
+  betNumber: number;
+  issuesNumber: number;
+}
 
-export function TableInput() {
-  const [selection, setSelection] = useState(['1']);
+export function TableInput({ betNumber, issuesNumber }: TableInputProps) {
+  const [selection, setSelection] = useState<string[]>([]);
+
+  const data = Array.from({ length: betNumber }, (_, index) => ({
+    id: (index + 1).toString(),
+    odds: Array.from({ length: issuesNumber }, () => issuesNumber.toString()), // Chaque odd est le nombre total d'issues
+  }));
+
   const toggleRow = (id: string) =>
     setSelection((current) =>
       current.includes(id) ? current.filter((item) => item !== id) : [...current, id]
     );
+
   const toggleAll = () =>
     setSelection((current) => (current.length === data.length ? [] : data.map((item) => item.id)));
 
@@ -32,11 +29,12 @@ export function TableInput() {
     return (
       <Table.Tr key={item.id} className={cx({ [classes.rowSelected]: selected })}>
         <Table.Td>
-          <Checkbox checked={selection.includes(item.id)} onChange={() => toggleRow(item.id)} />
+          <Checkbox checked={selected} onChange={() => toggleRow(item.id)} />
         </Table.Td>
         <Table.Td>{item.id}</Table.Td>
-        <Table.Td>{item.odd1}</Table.Td>
-        <Table.Td>{item.odd2}</Table.Td>
+        {item.odds.map((odd, index) => (
+          <Table.Td key={index}>{odd}</Table.Td>
+        ))}
       </Table.Tr>
     );
   });
@@ -53,9 +51,10 @@ export function TableInput() {
                 indeterminate={selection.length > 0 && selection.length !== data.length}
               />
             </Table.Th>
-            <Table.Th>Index</Table.Th>
-            <Table.Th>Odd 1</Table.Th>
-            <Table.Th>Odd 2</Table.Th>
+            <Table.Th>Matches</Table.Th>
+            {Array.from({ length: issuesNumber }, (_, index) => (
+              <Table.Th key={index}>Odd {index + 1}</Table.Th>
+            ))}
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>{rows}</Table.Tbody>
