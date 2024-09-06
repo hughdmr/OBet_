@@ -1,7 +1,13 @@
-/* .invalid {
-    background-color: var(--mantine-color-red-light);
-  }
-  
-  .icon {
-    color: light-dark(var(--mantine-color-red-6), var(--mantine-color-red-7));
-  } */
+/* ValueInputs.module.css */
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px; /* Un espace raisonnable entre chaque élément */
+  height: auto; /* S'assure que le conteneur n'étend pas la hauteur */
+}
+
+.scrollable {
+  width: 100%; /* S'assure que le tableau prend toute la largeur disponible */
+  overflow-x: auto; /* Permet le défilement horizontal si nécessaire */
+  max-height: 100%; /* Ajuste la hauteur pour éviter des comportements inattendus */
+}
