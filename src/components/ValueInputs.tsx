@@ -1,103 +1,89 @@
-'use client'
-
-import { NumberInput, Select, Table, TextInput, Checkbox, rem, Button } from '@mantine/core';
+import React, { useState, useEffect } from 'react';
+import { Text, NumberInput, Select, Table, TextInput, Checkbox, Button } from '@mantine/core';
 import cx from 'clsx';
-import { useState, useEffect } from 'react';
-import classes from './TableInput.module.css';
+import './ValueInputs.module.css'; // Assurez-vous que le fichier CSS est correctement importé
 
-// Composants InputIssuesNumber, InputBetNumber et InputOperationType
-interface InputIssuesNumberProps {
-  setIssuesNumber: (value: number) => void;
-}
+// Composant InputIssuesNumber
+const InputIssuesNumber: React.FC<{ setIssuesNumber: (value: number) => void }> = ({ setIssuesNumber }) => (
+  <NumberInput
+    label="Number of issues (independants)"
+    placeholder="Number between 2 and 20"
+    defaultValue={2}
+    clampBehavior="strict"
+    min={2}
+    max={20}
+    allowDecimal={false}
+    stepHoldDelay={500}
+    stepHoldInterval={100}
+    onChange={(value) => setIssuesNumber(value as number)}
+  />
+);
 
-export function InputIssuesNumber({ setIssuesNumber }: InputIssuesNumberProps) {
-  return (
-    <NumberInput
-      label="Number of issues (independants)"
-      placeholder="Number between 2 and 20"
-      defaultValue={2}
-      clampBehavior="strict"
-      min={2}
-      max={20}
-      allowDecimal={false}
-      stepHoldDelay={500}
-      stepHoldInterval={100}
-      onChange={(value) => setIssuesNumber(value as number)}
-    />
-  );
-}
+// Composant InputBetNumber
+const InputBetNumber: React.FC<{ setBetNumber: (value: number) => void }> = ({ setBetNumber }) => (
+  <NumberInput
+    label="Number of matches"
+    placeholder="Number between 1 and 100"
+    defaultValue={1}
+    clampBehavior="strict"
+    min={1}
+    max={100}
+    allowDecimal={false}
+    stepHoldDelay={500}
+    stepHoldInterval={100}
+    onChange={(value) => setBetNumber(value as number)}
+  />
+);
 
-interface InputBetNumberProps {
-  setBetNumber: (value: number) => void;
-}
+// Composant InputOperationType
+const InputOperationType: React.FC<{ setOperationType: (value: string | null) => void }> = ({ setOperationType }) => (
+  <Select
+    mt="md"
+    comboboxProps={{ withinPortal: true }}
+    data={[
+      'Combined of Fair Odds 1 (Intersection with independants events)', 
+      'Soustraction (Privation with independants events)', 
+      'Multichance Separated (Union with combined null)', 
+      'Multichance Unseparated (Union with combined not null)'
+    ]}
+    placeholder="Pick one"
+    label="Operation"
+    onChange={(value) => setOperationType(value!)}
+  />
+);
 
-export function InputBetNumber({ setBetNumber }: InputBetNumberProps) {
-  return (
-    <NumberInput
-      label="Number of matches"
-      placeholder="Number between 1 and 100"
-      defaultValue={1}
-      clampBehavior="strict"
-      min={1}
-      max={100}
-      allowDecimal={false}
-      stepHoldDelay={500}
-      stepHoldInterval={100}
-      onChange={(value) => setBetNumber(value as number)}
-    />
-  );
-}
-
-export function InputOperationType({ setOperationType }: { setOperationType: (value: string) => void }) {
-  return (
-    <Select
-      mt="md"
-      comboboxProps={{ withinPortal: true }}
-      data={[
-        'Combined (Intersection with independants events)', 
-        'Soustraction (Privation with independants events)', 
-        'Multichance Separated (Union with combined null)', 
-        'Multichance Unseparated (Union with combined not null)'
-      ]}
-      placeholder="Pick one"
-      label="Operation"
-      onChange={(value) => setOperationType} // Ajoutez cette ligne pour mettre à jour le type d'opération
-    />
-  );
-}
-
-// Composant principal avec la logique d'affichage
-export function TableInput({ betNumber, issuesNumber }: { betNumber: number; issuesNumber: number }) {
+// Composant TableInput
+const TableInput: React.FC<{
+  issuesNumber: number;
+  betNumber: number;
+  operationType: string | null;
+  setOperationType: (value: string | null) => void;
+}> = ({ issuesNumber, betNumber, operationType, setOperationType }) => {
   const [data, setData] = useState(() =>
     Array.from({ length: betNumber }, (_, index) => ({
       id: (index + 1).toString(),
       match: `Match ${index + 1}`,
-      odds: Array.from({ length: issuesNumber }, () => '1.00'), // Valeur par défaut des odds
+      odds: Array.from({ length: issuesNumber }, () => '1'),
     }))
   );
 
-  const [operationType, setOperationType] = useState<string | null>(null); // État pour stocker l'opération sélectionnée
+  const [selection, setSelection] = useState<string[]>([]);
   const [showNewRows, setShowNewRows] = useState(false);
+  const [showOperationType, setShowOperationType] = useState(false);
 
   useEffect(() => {
     setData(() =>
       Array.from({ length: betNumber }, (_, index) => ({
         id: (index + 1).toString(),
         match: `Match ${index + 1}`,
-        odds: Array.from({ length: issuesNumber }, () => '1.00'), // Réinitialisation
+        odds: Array.from({ length: issuesNumber }, () => '1'),
       }))
     );
+    setSelection([]);
     setShowNewRows(false);
+    setShowOperationType(false); // Réinitialiser l'affichage de InputOperationType
+    setOperationType(null);
   }, [betNumber, issuesNumber]);
-
-  // Calculer la multiplication des valeurs dans la colonne "odd1" si l'option "Combined" est sélectionnée
-  const calculateCombinedOdds = () => {
-    if (operationType === 'Combined (Intersection with independants events)') {
-      const odd1Values = data.map((item) => parseFloat(item.odds[0] || '1')); // Multiplier seulement la première colonne
-      return odd1Values.reduce((acc, odd) => acc * odd, 1).toFixed(2); // Multiplication des odds
-    }
-    return null;
-  };
 
   const handleInputChange = (id: string, index: number, value: string) => {
     setData((prevData) =>
@@ -112,47 +98,135 @@ export function TableInput({ betNumber, issuesNumber }: { betNumber: number; iss
     );
   };
 
-  const rows = data.map((item) => (
-    <Table.Tr key={item.id}>
-      <Table.Td>{item.match}</Table.Td>
-      {item.odds.map((odd, index) => (
-        <Table.Td key={index}>
-          <TextInput
+  const handleMatchChange = (id: string, value: string) => {
+    setData((prevData) =>
+      prevData.map((item) =>
+        item.id === id
+          ? { ...item, match: value }
+          : item
+      )
+    );
+  };
+
+  const toggleRow = (id: string) =>
+    setSelection((current) =>
+      current.includes(id) ? current.filter((item) => item !== id) : [...current, id]
+    );
+
+  const toggleAll = () =>
+    setSelection((current) => (current.length === data.length ? [] : data.map((item) => item.id)));
+
+  const calculateOdd1Multiplication = () => {
+    return data
+      .map(item => parseFloat(item.odds[0]))
+      .reduce((acc, curr) => acc * curr, 1)
+      .toFixed(2);
+  };
+
+  const rows = data.flatMap((item) => {
+    const selected = selection.includes(item.id);
+
+    const originalRow = (
+      <Table.Tr key={item.id} className={cx({ 'rowSelected': selected })}>
+        <Table.Td>
+          <Checkbox checked={selected} onChange={() => toggleRow(item.id)} />
+        </Table.Td>
+        <Table.Td>
+          <TextInput 
             type="text"
-            value={odd}
-            onChange={(e) => handleInputChange(item.id, index, e.target.value)}
+            value={item.match}
+            onChange={(e) => handleMatchChange(item.id, e.target.value)}
             style={{ width: '100%' }}
           />
         </Table.Td>
-      ))}
-    </Table.Tr>
-  ));
+        {item.odds.map((odd, index) => (
+          <Table.Td key={index} style={{ minWidth: '120px' }}>
+            <TextInput 
+              type="text"
+              value={odd}
+              onChange={(e) => handleInputChange(item.id, index, e.target.value)}
+              style={{ width: '100%' }}
+            />
+          </Table.Td>
+        ))}
+      </Table.Tr>
+    );
 
-  const combinedOddsResult = calculateCombinedOdds(); // Calculer les odds combinés
+    const newRow = showNewRows ? (
+      <Table.Tr key={`new-${item.id}`} className={cx('nonEditableRow')}>
+        <Table.Td />
+        <Table.Td>
+          <TextInput 
+            type="text"
+            value={`${item.match} FO`} 
+            readOnly
+            style={{ width: '100%' }}
+          />
+        </Table.Td>
+        {item.odds.map((odd, index) => (
+          <Table.Td key={`new-${item.id}-${index}`} style={{ minWidth: '120px' }}>
+            <TextInput 
+              type="text"
+              value={odd} 
+              readOnly
+              style={{ width: '100%' }}
+            />
+          </Table.Td>
+        ))}
+      </Table.Tr>
+    ) : null;
+
+    return [originalRow, newRow].filter(Boolean);
+  });
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-      <InputOperationType setOperationType={setOperationType} /> {/* Sélection d'opération */}
+    <div>
       <div style={{ overflowX: 'auto', width: '100%' }}>
-        <Table miw={800} verticalSpacing="sm">
-          <Table.Thead>
-            <Table.Tr>
-              <Table.Th>Matches</Table.Th>
-              {Array.from({ length: issuesNumber }, (_, index) => (
-                <Table.Th key={index}>Odd {index + 1}</Table.Th>
-              ))}
-            </Table.Tr>
-          </Table.Thead>
-          <Table.Tbody>{rows}</Table.Tbody>
-        </Table>
+        <div style={{ maxHeight: 'calc(100vh - 80px)', overflowY: 'auto' }}>
+          <Table miw={800} verticalSpacing="sm">
+            <Table.Thead>
+              <Table.Tr>
+                <Table.Th style={{ width: '40px' }}>
+                  <Checkbox
+                    onChange={toggleAll}
+                    checked={selection.length === data.length}
+                    indeterminate={selection.length > 0 && selection.length !== data.length}
+                  />
+                </Table.Th>
+                <Table.Th style={{ minWidth: '150px' }}>Matches</Table.Th>
+                {Array.from({ length: issuesNumber }, (_, index) => (
+                  <Table.Th key={index} style={{ minWidth: '120px' }}>Odd {index + 1}</Table.Th>
+                ))}
+              </Table.Tr>
+            </Table.Thead>
+            <Table.Tbody>
+              {rows}
+            </Table.Tbody>
+          </Table>
+        </div>
       </div>
-      {/* Afficher le résultat seulement si l'option "Combined" est sélectionnée */}
-      {combinedOddsResult && (
-        <div style={{ marginTop: '20px' }}>
-          <p><strong>Combined odds result (Odd1):</strong> {combinedOddsResult}</p>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <Button 
+          mt="md"
+          onClick={() => {
+            setShowNewRows(true); // Afficher les nouvelles lignes après avoir cliqué sur "Calculate"
+            setShowOperationType(true); // Afficher InputOperationType après avoir cliqué sur "Calculate"
+          }}
+        >
+          Calculate
+        </Button>
+      </div>
+      {showOperationType && <InputOperationType setOperationType={setOperationType} />}
+      {operationType === 'Combined of Fair Odds 1 (Intersection with independants events)' && (
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '20px' }}>
+          <Text style={{ marginBottom: '10px' }}>
+            Results: Multiplication Odd 1: <strong>{calculateOdd1Multiplication()}</strong>
+          </Text>
         </div>
       )}
-      <Button onClick={() => setShowNewRows(true)} style={{ marginTop: '20px' }}>Calculate</Button>
     </div>
   );
-}
+};
+
+export default TableInput;
+export { InputIssuesNumber, InputBetNumber, InputOperationType, TableInput };

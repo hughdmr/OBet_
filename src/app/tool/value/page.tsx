@@ -1,24 +1,21 @@
-'use client'
+'use client';
 
 import { useState } from 'react';
-import { InputIssuesNumber, InputBetNumber, InputOperationType } from '../../../components/ValueInputs';
-import { TableInput } from '../../../components/TableInput';
+import { InputIssuesNumber, InputBetNumber, InputOperationType, TableInput } from '../../../components/ValueInputs';
 import classes from '../../../components/ValueInputs.module.css';
 
 export default function Home() {
   const [betNumber, setBetNumber] = useState(1);
   const [issuesNumber, setIssuesNumber] = useState(2);
-  const [operationType, setOperationType] = useState<string | null>(null); // État pour l'opération sélectionnée
+  const [operationType, setOperationType] = useState<string | null>(null);
 
   return (
     <div className={classes.container}>
       <InputBetNumber setBetNumber={setBetNumber} />
       <InputIssuesNumber setIssuesNumber={setIssuesNumber} />
       <div className={classes.scrollable}>
-      <TableInput betNumber={betNumber} issuesNumber={issuesNumber} operationType={operationType} />
+        <TableInput betNumber={betNumber} issuesNumber={issuesNumber} operationType={operationType} setOperationType={setOperationType}/>
       </div>
-      {/* Ici, l'input apparaîtra juste sous le tableau */}
-      <InputOperationType setOperationType={setOperationType} />
     </div>
   );
 }

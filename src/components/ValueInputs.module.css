@@ -11,3 +11,7 @@
   overflow-x: auto; /* Permet le défilement horizontal si nécessaire */
   max-height: 100%; /* Ajuste la hauteur pour éviter des comportements inattendus */
 }
+
+.rowSelected {
+  background-color: var(--mantine-color-blue-light);
+}
