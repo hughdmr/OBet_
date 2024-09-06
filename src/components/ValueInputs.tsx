@@ -41,9 +41,9 @@ const InputOperationType: React.FC<{ setOperationType: (value: string | null) =>
     mt="md"
     comboboxProps={{ withinPortal: true }}
     data={[
-      'Combined of Fair Odds 1 (Intersection with independants events)', 
-      'Soustraction (Privation with independants events)', 
-      'Multichance Separated (Union with combined null)', 
+      'Combined (Intersection with independants events) = M1-FO1 x M1-FO2 x M1-FO3 x ...',
+      'Soustraction (Privation with inclued events) = 1/(1/M1-FO1 - 1/M1-FO2 - 1/M1-FO3 - ... )',
+      'Multichance Separated (Union with combined null)',
       'Multichance Unseparated (Union with combined not null)'
     ]}
     placeholder="Pick one"
@@ -70,6 +70,7 @@ const TableInput: React.FC<{
   const [selection, setSelection] = useState<string[]>([]);
   const [showNewRows, setShowNewRows] = useState(false);
   const [showOperationType, setShowOperationType] = useState(false);
+  const [calculationDetails, setCalculationDetails] = useState<string>('');
 
   useEffect(() => {
     setData(() =>
@@ -83,6 +84,7 @@ const TableInput: React.FC<{
     setShowNewRows(false);
     setShowOperationType(false); // Réinitialiser l'affichage de InputOperationType
     setOperationType(null);
+    setCalculationDetails('');
   }, [betNumber, issuesNumber]);
 
   const handleInputChange = (id: string, index: number, value: string) => {
@@ -90,9 +92,9 @@ const TableInput: React.FC<{
       prevData.map((item) =>
         item.id === id
           ? {
-              ...item,
-              odds: item.odds.map((odd, i) => (i === index ? value : odd)),
-            }
+            ...item,
+            odds: item.odds.map((odd, i) => (i === index ? value : odd)),
+          }
           : item
       )
     );
@@ -116,11 +118,30 @@ const TableInput: React.FC<{
   const toggleAll = () =>
     setSelection((current) => (current.length === data.length ? [] : data.map((item) => item.id)));
 
-  const calculateOdd1Multiplication = () => {
-    return data
-      .map(item => parseFloat(item.odds[0]))
-      .reduce((acc, curr) => acc * curr, 1)
-      .toFixed(2);
+  const calculateMultiplication = () => {
+    const odds = data.map(item => parseFloat(item.odds[0]));
+    const product = odds.reduce((acc, curr) => acc * curr, 1).toFixed(2);
+
+    const details = odds
+      .map(odd => odd.toFixed(2)) // Convertir chaque cote en chaîne avec deux décimales
+      .join(' x ') + ` = ${product}`; // Joindre avec "x" et ajouter le produit à la fin
+
+    setCalculationDetails(details);
+    return product;
+  };
+
+  const calculateSubtraction = () => {
+    const odds = data.map(item => parseFloat(item.odds[0]));
+    const reciprocals = odds.map(odd => 1 / odd);
+    const sumOfReciprocals = reciprocals.reduce((acc, curr) => acc - curr, 0);
+    const result = (1 / sumOfReciprocals).toFixed(2);
+  
+    const details = reciprocals
+      .map(rec => rec.toFixed(2)) // Convertir chaque réciproque en chaîne avec deux décimales
+      .join(' - ') + ` = ${result}`; // Joindre avec "-" et ajouter le résultat à la fin
+  
+    setCalculationDetails(details);
+    return result;
   };
 
   const rows = data.flatMap((item) => {
@@ -132,7 +153,7 @@ const TableInput: React.FC<{
           <Checkbox checked={selected} onChange={() => toggleRow(item.id)} />
         </Table.Td>
         <Table.Td>
-          <TextInput 
+          <TextInput
             type="text"
             value={item.match}
             onChange={(e) => handleMatchChange(item.id, e.target.value)}
@@ -141,7 +162,7 @@ const TableInput: React.FC<{
         </Table.Td>
         {item.odds.map((odd, index) => (
           <Table.Td key={index} style={{ minWidth: '120px' }}>
-            <TextInput 
+            <TextInput
               type="text"
               value={odd}
               onChange={(e) => handleInputChange(item.id, index, e.target.value)}
@@ -156,18 +177,18 @@ const TableInput: React.FC<{
       <Table.Tr key={`new-${item.id}`} className={cx('nonEditableRow')}>
         <Table.Td />
         <Table.Td>
-          <TextInput 
+          <TextInput
             type="text"
-            value={`${item.match} FO`} 
+            value={`${item.match} FO`}
             readOnly
             style={{ width: '100%' }}
           />
         </Table.Td>
         {item.odds.map((odd, index) => (
           <Table.Td key={`new-${item.id}-${index}`} style={{ minWidth: '120px' }}>
-            <TextInput 
+            <TextInput
               type="text"
-              value={odd} 
+              value={odd}
               readOnly
               style={{ width: '100%' }}
             />
@@ -178,6 +199,14 @@ const TableInput: React.FC<{
 
     return [originalRow, newRow].filter(Boolean);
   });
+
+  const handleCalculate = (operationType: any) => {
+    if (operationType === 'Combined (Intersection with independants events) = M1-FO1 x M1-FO2 x M1-FO3 x ...') {
+      calculateMultiplication();
+    } else if (operationType === 'Soustraction (Privation with inclued events) = 1/(1/M1-FO1 - 1/M1-FO2 - 1/M1-FO3 - ... )') {
+      calculateSubtraction();
+    }
+  }
 
   return (
     <div>
@@ -205,28 +234,35 @@ const TableInput: React.FC<{
           </Table>
         </div>
       </div>
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-        <Button 
-          mt="md"
-          onClick={() => {
-            setShowNewRows(true); // Afficher les nouvelles lignes après avoir cliqué sur "Calculate"
-            setShowOperationType(true); // Afficher InputOperationType après avoir cliqué sur "Calculate"
-          }}
-        >
-          Calculate
-        </Button>
-      </div>
-      {showOperationType && <InputOperationType setOperationType={setOperationType} />}
-      {operationType === 'Combined of Fair Odds 1 (Intersection with independants events)' && (
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '20px' }}>
-          <Text style={{ marginBottom: '10px' }}>
-            Results: Multiplication Odd 1: <strong>{calculateOdd1Multiplication()}</strong>
-          </Text>
+      <div>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <Button
+            mt="md"
+            onClick={() => {
+              handleCalculate(operationType); // Calculer les détails lors du clic sur "Calculate"
+              setShowNewRows(true); // Afficher les nouvelles lignes après avoir calculé
+              setShowOperationType(true);
+            }}
+          >
+            Calculate
+          </Button>
         </div>
-      )}
+        {showOperationType && <InputOperationType setOperationType={setOperationType} />}
+        {operationType === 'Combined (Intersection with independants events) = M1-FO1 x M1-FO2 x M1-FO3 x ...' && (
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <Text style={{ marginBottom: '10px' }}>Calculation Details : {calculationDetails}</Text>
+          </div>
+        )}
+        {operationType === 'Soustraction (Privation with inclued events) = 1/(1/M1-FO1 - 1/M1-FO2 - 1/M1-FO3 - ... )' && (
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <Text style={{ marginBottom: '10px' }}>Calculation Details : {calculationDetails}</Text>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
 
 export default TableInput;
+
 export { InputIssuesNumber, InputBetNumber, InputOperationType, TableInput };
