@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Text, NumberInput, Select, Table, TextInput, Checkbox, Button } from '@mantine/core';
 import cx from 'clsx';
-import './ValueInputs.module.css'; // Assurez-vous que le fichier CSS est correctement importé
+import './ValueInputs.module.css';
+import { calculateMultiplication, calculateSubtraction, calculateUnion } from './calculations';
 
 // Composant InputIssuesNumber
 const InputIssuesNumber: React.FC<{ setIssuesNumber: (value: number) => void }> = ({ setIssuesNumber }) => (
@@ -44,10 +45,10 @@ const InputOperationType: React.FC<{
     mt="md"
     comboboxProps={{ withinPortal: true }}
     data={[
-      'Combined (Intersection with independants events) = M1-FO1 x M1-FO2 x M1-FO3 x ...',
-      'Soustraction (Privation with inclued events) = 1/(1/M1-FO1 - 1/M1-FO2 - 1/M1-FO3 - ... )',
-      'Multichance Separated (Union with combined null)',
-      'Multichance Unseparated (Union with combined not null)'
+      'Combined (Intersection of independants events P(A∩B) = P(A)xP(B)) = M1-FO1 x M1-FO2 x M1-FO3 x ...',
+      'Soustraction (Privation of inclued events P(A/B) = P(A)-P(A∩B) = P(A)-P(B)) = 1/(1/M1-FO1 - 1/M1-FO2 - 1/M1-FO3 - ... )',
+      'Multichance of independants events (Union : P(A∪B) = P(A)+P(B)-P(A∩B) = P(A)+P(B)-P(A)xP(B))',
+      'Multichance of dependants events (Union : P(A∪B) = P(A)+P(B)-P(A∩B))',
     ]}
     placeholder="Pick one"
     label="Operation"
@@ -76,6 +77,7 @@ const TableInput: React.FC<{
   const [selection, setSelection] = useState<string[]>([]);
   const [showNewRows, setShowNewRows] = useState(false);
   const [showOperationType, setShowOperationType] = useState(false);
+  const [showIntersectionField, setShowIntersectionField] = useState(false); // Ajouté pour le champ supplémentaire
   const [calculationDetails, setCalculationDetails] = useState<string>('');
 
   useEffect(() => {
@@ -91,6 +93,7 @@ const TableInput: React.FC<{
     setShowOperationType(false); // Réinitialiser l'affichage de InputOperationType
     setOperationType(null);
     setCalculationDetails('');
+    setShowIntersectionField(false); // Réinitialiser l'affichage du champ supplémentaire
   }, [betNumber, issuesNumber]);
 
   const handleInputChange = (id: string, index: number, value: string) => {
@@ -122,33 +125,7 @@ const TableInput: React.FC<{
     );
 
   const toggleAll = () =>
-    setSelection((current) => (current.length === data.length ? [] : data.map((item) => item.id)));
-
-  const calculateMultiplication = () => {
-    const odds = data.map(item => parseFloat(item.odds[0]));
-    const product = odds.reduce((acc, curr) => acc * curr, 1).toFixed(2);
-
-    const details = odds
-      .map(odd => odd.toFixed(2)) // Convertir chaque cote en chaîne avec deux décimales
-      .join(' x ') + ` = ${product}`; // Joindre avec "x" et ajouter le produit à la fin
-
-    setCalculationDetails(details);
-    return product;
-  };
-
-  const calculateSubtraction = () => {
-    const odds = data.map(item => parseFloat(item.odds[0]));
-    const reciprocals = odds.map(odd => 1 / odd);
-    const sumOfReciprocals = reciprocals.reduce((acc, curr) => acc - curr, 0);
-    const result = (1 / sumOfReciprocals).toFixed(2);
-  
-    const details = reciprocals
-      .map(rec => rec.toFixed(2)) // Convertir chaque réciproque en chaîne avec deux décimales
-      .join(' - ') + ` = ${result}`; // Joindre avec "-" et ajouter le résultat à la fin
-  
-    setCalculationDetails(details);
-    return result;
-  };
+    setSelection((current) => (current.length === data.length ? [] : data.map((item) => item.id)));  
 
   const rows = data.flatMap((item) => {
     const selected = selection.includes(item.id);
@@ -209,9 +186,19 @@ const TableInput: React.FC<{
 
   const handleCalculate = (operationType: string | null) => {
     if (operationType === 'Combined (Intersection with independants events) = M1-FO1 x M1-FO2 x M1-FO3 x ...') {
-      calculateMultiplication();
+      setShowIntersectionField(false); // Cacher le champ supplémentaire pour les autres opérations
+      calculateMultiplication(data);
     } else if (operationType === 'Soustraction (Privation with inclued events) = 1/(1/M1-FO1 - 1/M1-FO2 - 1/M1-FO3 - ... )') {
-      calculateSubtraction();
+      setShowIntersectionField(false); // Cacher le champ supplémentaire pour les autres opérations
+      calculateSubtraction(data);
+    }
+    else if (operationType === 'Multichance of dependants events (Union : P(A∪B) = P(A)+P(B)-P(A∩B))') {
+      setShowIntersectionField(true); // Afficher le champ supplémentaire
+      calculateUnion('dependants', data, []);
+    } 
+    else if (operationType === 'Multichance of independants events (Union : P(A∪B) = P(A)+P(B)-P(A∩B) = P(A)+P(B)-P(A)xP(B))') {
+      setShowIntersectionField(false); // Cacher le champ supplémentaire pour les autres opérations
+      calculateUnion('independants', data, [])
     }
   }
 
@@ -258,6 +245,13 @@ const TableInput: React.FC<{
             setOperationType={setOperationType} 
             operationCalculate={handleCalculate}
           />
+        )}
+        {showIntersectionField && (
+          <TextInput
+    label="Cote de (A∩B)"
+    value={showIntersectionField ? 'true' : 'false'}
+    onChange={(e) => setShowIntersectionField(e.currentTarget.value === 'true')}
+  />
         )}
         {operationType && (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
