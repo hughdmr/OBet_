@@ -36,7 +36,10 @@ const InputBetNumber: React.FC<{ setBetNumber: (value: number) => void }> = ({ s
 );
 
 // Composant InputOperationType
-const InputOperationType: React.FC<{ setOperationType: (value: string | null) => void }> = ({ setOperationType }) => (
+const InputOperationType: React.FC<{ 
+  setOperationType: (value: string | null) => void, 
+  operationCalculate: (value: string | null) => void 
+}> = ({ setOperationType, operationCalculate }) => (
   <Select
     mt="md"
     comboboxProps={{ withinPortal: true }}
@@ -48,7 +51,10 @@ const InputOperationType: React.FC<{ setOperationType: (value: string | null) =>
     ]}
     placeholder="Pick one"
     label="Operation"
-    onChange={(value) => setOperationType(value!)}
+    onChange={(value) => {
+      setOperationType(value!);
+      operationCalculate(value);
+    }}
   />
 );
 
@@ -200,7 +206,8 @@ const TableInput: React.FC<{
     return [originalRow, newRow].filter(Boolean);
   });
 
-  const handleCalculate = (operationType: any) => {
+
+  const handleCalculate = (operationType: string | null) => {
     if (operationType === 'Combined (Intersection with independants events) = M1-FO1 x M1-FO2 x M1-FO3 x ...') {
       calculateMultiplication();
     } else if (operationType === 'Soustraction (Privation with inclued events) = 1/(1/M1-FO1 - 1/M1-FO2 - 1/M1-FO3 - ... )') {
@@ -239,7 +246,6 @@ const TableInput: React.FC<{
           <Button
             mt="md"
             onClick={() => {
-              handleCalculate(operationType); // Calculer les détails lors du clic sur "Calculate"
               setShowNewRows(true); // Afficher les nouvelles lignes après avoir calculé
               setShowOperationType(true);
             }}
@@ -247,13 +253,13 @@ const TableInput: React.FC<{
             Calculate
           </Button>
         </div>
-        {showOperationType && <InputOperationType setOperationType={setOperationType} />}
-        {operationType === 'Combined (Intersection with independants events) = M1-FO1 x M1-FO2 x M1-FO3 x ...' && (
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <Text style={{ marginBottom: '10px' }}>Calculation Details : {calculationDetails}</Text>
-          </div>
+        {showOperationType && (
+          <InputOperationType 
+            setOperationType={setOperationType} 
+            operationCalculate={handleCalculate}
+          />
         )}
-        {operationType === 'Soustraction (Privation with inclued events) = 1/(1/M1-FO1 - 1/M1-FO2 - 1/M1-FO3 - ... )' && (
+        {operationType && (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <Text style={{ marginBottom: '10px' }}>Calculation Details : {calculationDetails}</Text>
           </div>
@@ -262,7 +268,5 @@ const TableInput: React.FC<{
     </div>
   );
 };
-
-export default TableInput;
 
 export { InputIssuesNumber, InputBetNumber, InputOperationType, TableInput };

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { InputBetNumber, InputIssuesNumber, InputOperationType, TableInput } from '../../../components/ValueInputs';
+import { InputBetNumber, InputIssuesNumber, TableInput } from '../../../components/ValueInputs';
 import classes from '../../../components/ValueInputs.module.css';
 
 export default function Home() {
