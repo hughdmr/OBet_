@@ -12,8 +12,10 @@ export default function Home() {
 
   return (
     <div className={classes.container}>
-      <InputBetNumber setBetNumber={setBetNumber} />
-      <InputIssuesNumber setIssuesNumber={setIssuesNumber} />
+      <div className={classes.flexContainer}>
+        <InputBetNumber setBetNumber={setBetNumber} />
+        <InputIssuesNumber setIssuesNumber={setIssuesNumber} />
+      </div>
       <div className={classes.scrollable}>
         <TableInput betNumber={betNumber} issuesNumber={issuesNumber} operationType={operationType} setOperationType={setOperationType}/>
       </div>

@@ -6,12 +6,57 @@
   height: auto; /* S'assure que le conteneur n'étend pas la hauteur */
 }
 
+.flexContainer {
+  display: flex;
+  gap: 20px; /* Espace entre les inputs */
+}
+
+
 .scrollable {
-  width: 100%; /* S'assure que le tableau prend toute la largeur disponible */
+  width: 100%; 
   overflow-x: auto; /* Permet le défilement horizontal si nécessaire */
   max-height: 100%; /* Ajuste la hauteur pour éviter des comportements inattendus */
 }
 
+.tableContainer {
+  overflow-x: auto;
+  width: 100%;
+}
+
+.tableWrapper {
+  max-height: calc(100vh - 80px);
+  overflow-y: auto;
+}
+
+.table {
+  table-layout: auto;
+  width: auto;
+}
+
+.thMatches{
+  min-width: 140px;  /* largeur minimale */
+  max-width: 140px; /* largeur maximale */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.thOdd, .tdInput {
+  min-width: 100px;  /* largeur minimale */
+  max-width: 100px; /* largeur maximale */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tdInput input {
+  width: 100%;
+}
+
 .rowSelected {
-  background-color: var(--mantine-color-blue-light);
+  background-color: #e0e0e0;
+}
+
+.nonEditableRow {
+  background-color: #f5f5f5;
 }
