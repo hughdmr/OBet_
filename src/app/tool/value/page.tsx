@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { InputBetNumber, InputIssuesNumber } from '../../../components/ValueInputs';
-import { TableInput } from '../../../components/ValueTable';
+import TableInput from '../../../components/ValueTable';
 import classes from '../../../components/ValueInputs.module.css';
 
 export default function Home() {
