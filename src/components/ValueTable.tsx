@@ -40,11 +40,15 @@ const TableInput: React.FC<{
     setShowNewRows(false);
     setShowOperationType(false);
     setOperationType(null);
-    setCalculationDetails('');
+    setCalculationDetails(''); // Réinitialisation des détails de calcul
     setShowIntersectionField(false);
     setIntersectionOdds([]);
     setCanCalculate(false);
   }, [betNumber, issuesNumber]);
+  
+  useEffect(() => {
+    setCalculationDetails(''); // Réinitialisation des détails de calcul lorsque l'opération change
+  }, [operationType]);  
 
   const handleInputChange = (id: string, index: number, value: string) => {
     setData((prevData) =>
@@ -144,28 +148,28 @@ const TableInput: React.FC<{
   const handleCalculate = () => {
     let result, details;
     switch (operationType) {
-      case 'Combined (Intersection with independants events) = M1-FO1 x M1-FO2 x M1-FO3 x ...':
-        ({ result, details } = calculateMultiplication(data));
-        setShowIntersectionField(false);
+      case 'Combined (Intersection with independants events)':
+        // setShowIntersectionField(false);  
+      ({ result, details } = calculateMultiplication(data));
         setCalculationDetails(details);
         break;
-      case 'Soustraction (Privation with inclued events) = 1/(1/M1-FO1 - 1/M1-FO2 - 1/M1-FO3 - ... )':
-        ({ result, details } = calculateSubtraction(data));
-        setShowIntersectionField(false);
+      case 'Soustraction (Privation with inclued events)':
+        // setShowIntersectionField(false);  
+      ({ result, details } = calculateSubtraction(data));
         setCalculationDetails(details);
         break;
       case 'Multichance of dependants events (Union : P(A∪B) = P(A)+P(B)-P(A∩B))':
-        setShowIntersectionField(true);
+        // setShowIntersectionField(true);
         ({ result, details } = calculateUnion('dependants', data, intersectionOdds.map(Number)));
         setCalculationDetails(details);
         break;
       case 'Multichance of independants events (Union : P(A∪B) = P(A)+P(B)-P(A∩B) = P(A)+P(B)-P(A)xP(B))':
-        ({ result, details } = calculateUnion('independants', data, []));
-        setShowIntersectionField(false);
+        // setShowIntersectionField(false);  
+      ({ result, details } = calculateUnion('independants', data, []));
         setCalculationDetails(details);
         break;
       default:
-        setShowIntersectionField(false);
+        setCalculationDetails('');
         break;
     }
   };  
@@ -209,15 +213,9 @@ const TableInput: React.FC<{
           </Button>
         </div>
         {showOperationType && (
-          <InputOperationType
-            setOperationType={(type) => {
-              setOperationType(type);
-              setCanCalculate(true);
-            }}
-            operationCalculate={handleCalculate}
-          />
-        )}
-        {showIntersectionField && (
+        <InputOperationType setOperationType={setOperationType} handleCalculate={handleCalculate} />
+      )}
+        {/* {showIntersectionField && (
           <div>
             {Array.from({ length: betNumber - 1 }, (_, index) => (
               <TextInput
@@ -229,18 +227,12 @@ const TableInput: React.FC<{
               />
             ))}
           </div>
-        )}
-        {canCalculate && (
-            <Button mt="md" onClick={handleCalculate}>
-              Calculate
-            </Button>
-          )}
+        )} */}
         {calculationDetails && (
-          <div>
-            <Text style={{ fontWeight: 700 }}>Calculation Details:</Text>
-            <Text>{calculationDetails}</Text>
-          </div>
-        )}
+        <Text mt="md">
+          {calculationDetails}
+        </Text>
+      )}
       </div>
     </div>
   );

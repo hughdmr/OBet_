@@ -1,5 +1,5 @@
-import React from 'react';
-import { NumberInput, Select } from '@mantine/core';
+import React, { useState } from 'react';
+import { NumberInput, Select, Button } from '@mantine/core';
 import './ValueInputs.module.css';
 
 // Composant InputIssuesNumber
@@ -34,27 +34,47 @@ const InputBetNumber: React.FC<{ setBetNumber: (value: number) => void }> = ({ s
   />
 );
 
-// Composant InputOperationType
-const InputOperationType: React.FC<{ 
-  setOperationType: (value: string | null) => void, 
-  operationCalculate: (value: string | null) => void 
-}> = ({ setOperationType, operationCalculate }) => (
-  <Select
-    mt="md"
-    comboboxProps={{ withinPortal: true }}
-    data={[
-      'Combined (Intersection of independants events P(A∩B) = P(A)xP(B)) = M1-FO1 x M1-FO2 x M1-FO3 x ...',
-      'Soustraction (Privation of inclued events P(A/B) = P(A)-P(A∩B) = P(A)-P(B)) = 1/(1/M1-FO1 - 1/M1-FO2 - 1/M1-FO3 - ... )',
-      'Multichance of independants events (Union : P(A∪B) = P(A)+P(B)-P(A∩B) = P(A)+P(B)-P(A)xP(B))',
-      'Multichance of dependants events (Union : P(A∪B) = P(A)+P(B)-P(A∩B))',
-    ]}
-    placeholder="Pick one"
-    label="Operation"
-    onChange={(value) => {
-      setOperationType(value!);
-      operationCalculate(value);
-    }}
-  />
-);
+interface InputOperationTypeProps {
+  setOperationType: (value: string | null) => void;
+  handleCalculate: () => void; // Renommé pour la clarté
+}
 
-export { InputIssuesNumber, InputBetNumber, InputOperationType };
+const InputOperationType: React.FC<InputOperationTypeProps> = ({ setOperationType, handleCalculate }) => {
+  const [selectedOperation, setSelectedOperation] = useState<string | null>(null);
+
+  const handleChange = (value: string | null) => {
+    setSelectedOperation(value);
+    setOperationType(value);
+  };
+
+  return (
+    <div>
+      <Select
+        mt="md"
+        comboboxProps={{ withinPortal: true }}
+        data={[
+          'Combined (Intersection with independants events)',// P(A∩B) = P(A)xP(B)) = M1-FO1 x M1-FO2 x M1-FO3 x ...',
+          'Soustraction (Privation with inclued events)', // P(A/B) = P(A)-P(A∩B) = P(A)-P(B)) = 1/(1/M1-FO1 - 1/M1-FO2 - 1/M1-FO3 - ... )',
+          'Multichance of independants events (Union : P(A∪B) = P(A)+P(B)-P(A∩B) = P(A)+P(B)-P(A)xP(B))',
+          'Multichance of dependants events (Union : P(A∪B) = P(A)+P(B)-P(A∩B))',
+        ]}
+        placeholder="Pick one"
+        label="Operation"
+        onChange={handleChange}
+      />
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+{selectedOperation && (
+        <Button 
+        mt="md"
+        onClick={handleCalculate} // Appeler handleCalculate ici
+      >
+        Calculate Operation
+      </Button>
+)}
+    </div>
+    </div>
+  );
+};
+
+export { InputOperationType, InputBetNumber, InputIssuesNumber};
+
