@@ -6,8 +6,8 @@ import './ValueInputs.module.css';
 const InputIssuesNumber: React.FC<{ setIssuesNumber: (value: number) => void }> = ({ setIssuesNumber }) => (
   <NumberInput
     label="Number of issues"
-    description="Mutually exclusive and collectively exhaustive events."
-    placeholder="Number between 2 and 100"
+    description="Should be mutually exclusive and collectively exhaustive events."
+    placeholder="Number between 1 and 100"
     defaultValue={2}
     clampBehavior="strict"
     min={1}
@@ -50,33 +50,35 @@ const InputOperationType: React.FC<InputOperationTypeProps> = ({ setOperationTyp
   };
 
   return (
-    <div>
+    <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-end', gap: '10px', width: '100%' }}>
       <Select
         mt="md"
         comboboxProps={{ withinPortal: true }}
         data={[
-          'Combined (Intersection with independants events)',// P(A∩B) = P(A)xP(B)) = M1-FO1 x M1-FO2 x M1-FO3 x ...',
-          'Soustraction (Privation with inclued events)', // P(A/B) = P(A)-P(A∩B) = P(A)-P(B)) = 1/(1/M1-FO1 - 1/M1-FO2 - 1/M1-FO3 - ... )',
-          'Multichance of independants events (Union : P(A∪B) = P(A)+P(B)-P(A∩B) = P(A)+P(B)-P(A)xP(B))',
-          'Multichance of dependants events (Union : P(A∪B) = P(A)+P(B)-P(A∩B))',
+          'Combined (Intersection with independants events)',
+          'Soustraction (Privation with inclued events)',
+          'Multichance of independants events (Union)',
+          'Multichance of dependants events (Union)',
         ]}
         placeholder="Pick one"
         label="Operation"
         onChange={handleChange}
+        style={{ width: '400px' }} // Fixer la largeur du Select à 200px
       />
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-{selectedOperation && (
-        <Button 
-        mt="md"
-        onClick={handleCalculate} // Appeler handleCalculate ici
-      >
-        Calculate Operation
-      </Button>
-)}
-    </div>
+      <div style={{ width: '150px'}}> {/* Container pour le bouton à droite */}
+        {selectedOperation && (
+          <Button 
+            mt="md"
+            onClick={handleCalculate}
+            style={{ whiteSpace: 'nowrap' }} // Pour empêcher le texte de se couper
+          >
+            Calculate Operation
+          </Button>
+        )}
+      </div>
     </div>
   );
-};
 
+};
 export { InputOperationType, InputBetNumber, InputIssuesNumber};
 
