@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Table, TextInput, Checkbox, Button, Text, Select } from '@mantine/core';
 import cx from 'clsx';
+import MathJax from 'react-mathjax2';
 import styles from './ValueInputs.module.css'; // Importation des styles CSS
-
-import { InputOperationType } from './ValueInputs';
-import { calculateMultiplication, calculateSubtraction, calculateUnion } from './calculations';
 
 const TableInput: React.FC<{
   issuesNumber: number;
@@ -29,6 +27,8 @@ const TableInput: React.FC<{
   const [canCalculate, setCanCalculate] = useState(false);
   const [newOdds, setNewOdds] = useState<string[][]>([]); // Type string[][] pour un tableau de tableaux
   const [selectedOperation, setSelectedOperation] = useState<string | null>(null);
+  const [operationResult, setOperationResult] = useState<string | null>(null); // New state for result
+
 
   useEffect(() => {
     const initialData = Array.from({ length: betNumber }, (_, index) => ({
@@ -189,44 +189,89 @@ const TableInput: React.FC<{
     });
   };
 
-  const handleOperationCalculate = () => {
-    console.log(newOdds)
+  const handleOperationCalculate = async () => {
+    console.log('New Odds:', newOdds);
+
     // Filtrer les données pour inclure uniquement les lignes sélectionnées avec Odds 1
-    const filteredData = data.filter((item, index) =>
-      selection.includes(item.id) &&
+    const filteredData = data
+    .filter((item, index) => 
+      selection.includes(item.id) && 
       newOdds[index]?.[0] !== undefined // Vérifie si le Odds 1 est défini pour la ligne
-    );
+    )
+    .map((item, index) => ({
+      ...item,
+      odds: newOdds[index], // Remplacer l'ancien odds par le nouveau odds depuis newOdds
+    }));
   
-    console.log('Filtered data:', filteredData); // Debugging line
-  
+    console.log('Filtered Data:', filteredData); // Debugging line
+
     let result, details;
     switch (operationType) {
-      case 'Combined (Intersection with independants events)':
-        ({ result, details } = calculateMultiplication(filteredData));
-        setCalculationDetails(details);
-        break;
-      case 'Soustraction (Privation with inclued events)':
-        ({ result, details } = calculateSubtraction(filteredData));
-        setCalculationDetails(details);
-        break;
-      case 'Multichance of dependants events (Union : P(A∪B) = P(A)+P(B)-P(A∩B))':
-        ({ result, details } = calculateUnion('dependants', filteredData, intersectionOdds.map(Number)));
-        setCalculationDetails(details);
-        break;
-      case 'Multichance of independants events (Union : P(A∪B) = P(A)+P(B)-P(A∩B) = P(A)+P(B)-P(A)xP(B))':
-        ({ result, details } = calculateUnion('independants', filteredData, []));
-        setCalculationDetails(details);
-        break;
-      default:
-        setCalculationDetails('');
-        break;
+        case 'Combined (Intersection with independants events)':
+          try {
+            console.log('Sending data to /combined API:', filteredData);
+            
+            const response = await fetch('http://localhost:3000/api/operations/combined', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ odds: filteredData.map(item => item.odds) }), // Assurez-vous que le format correspond à ce que l'API attend
+            });
+      
+            console.log('Response Status:', response.status);
+
+            if (!response.ok) {
+              const errorText = await response.text();
+              console.error('Error response:', errorText);
+              throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+      
+            const jsonResponse = await response.json();
+            console.log('Response JSON:', jsonResponse);
+
+            ({ result, details } = jsonResponse);
+            setCalculationDetails(details);
+            setOperationResult(result);
+          } catch (error) {
+            console.error('Error during fetch operation:', error);
+            setCalculationDetails('Error occurred while fetching the data.');
+          }
+          break;
+        
+        case 'Soustraction (Privation with inclued events)':
+          console.log('Calling calculateSubtraction with filteredData:', filteredData);
+          ({ result, details } = calculateSubtraction(filteredData));
+          console.log('Subtraction Result:', result, 'Details:', details);
+          setCalculationDetails(details);
+          setOperationResult(result);
+          break;
+
+        case 'Multichance of dependants events (Union : P(A∪B) = P(A)+P(B)-P(A∩B))':
+          console.log('Calling calculateUnion with dependants:', filteredData, intersectionOdds.map(Number));
+          ({ result, details } = calculateUnion('dependants', filteredData, intersectionOdds.map(Number)));
+          console.log('Union Result:', result, 'Details:', details);
+          setCalculationDetails(details);
+          setOperationResult(result);
+          break;
+
+        case 'Multichance of independants events (Union : P(A∪B) = P(A)+P(B)-P(A∩B) = P(A)+P(B)-P(A)xP(B))':
+          console.log('Calling calculateUnion with independants:', filteredData, []);
+          ({ result, details } = calculateUnion('independants', filteredData, []));
+          console.log('Union Result:', result, 'Details:', details);
+          setCalculationDetails(details);
+          setOperationResult(result);
+          break;
+
+        default:
+          console.warn('Unknown operation type:', operationType);
+          setCalculationDetails('');
+          break;
     }
-  };  
-  
+};
 
-  
 
-  return (
+    return (
     <div>
       <div className={styles.tableContainer}>
         <div className={styles.tableWrapper}>
@@ -273,42 +318,53 @@ const TableInput: React.FC<{
             />
         </div>
         {showOperationType && (
+        <div style={{ width: '100%' }}>
             <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-end', gap: '10px', width: '100%' }}>
                 <Select
-                mt="md"
-                comboboxProps={{ withinPortal: true }}
-                data={[
-                    'Combined (Intersection with independants events)',
-                    'Soustraction (Privation with inclued events)',
-                    'Multichance of independants events (Union)',
-                    'Multichance of dependants events (Union)',
-                ]}
-                placeholder="Pick one"
-                label="Operation"
-                onChange={handleOperationChange}
-                style={{ width: '400px' }} // Fixer la largeur du Select à 200px
+                    mt="md"
+                    comboboxProps={{ withinPortal: true }}
+                    data={[
+                        'Combined (Intersection with independants events)',
+                        'Soustraction (Privation with inclued events)',
+                        'Multichance of independants events (Union)',
+                        'Multichance of dependants events (Union)',
+                    ]}
+                    placeholder="Pick one"
+                    label="Operation"
+                    onChange={handleOperationChange}
+                    style={{ width: '400px' }}
                 />
                 {selectedOperation && (
-                    <div style={{  display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '10px'}}> {/* Container pour le bouton à droite */}
-                    <Button 
-                    mt="md"
-                    onClick={handleOperationCalculate}
-                    style={{ whiteSpace: 'nowrap' }} // Pour empêcher le texte de se couper
+                <div style={{  display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '10px'}}> {/* Container pour le bouton à droite */}
+                    <Button
+                        mt="md"
+                        onClick={handleOperationCalculate}
+                        style={{ whiteSpace: 'nowrap' }} // To prevent text wrapping
                     >
-                    Calculate Operation
+                        Calculate Operation
                     </Button>
-                            {calculationDetails && (
-                                <div>
-                                <Text mt="md">
-                                    {calculationDetails}
-                                </Text>
-                                </div>
-                            )}
-                        
+
+                    {operationResult && (
+                    <div>
+                    <Text mt="md" style={{ marginLeft: '30px' }}>
+                        Result: {operationResult}
+                    </Text>
                     </div>
+                    )}
+                </div>
                 )}
             </div>
-        )}
+            
+            {/* Display calculation details on the next line */}
+            {calculationDetails && (
+            <div style={{ marginTop: '10px', textAlign: 'left'}}> {/* Add some margin to separate it from the button */}
+                <MathJax.Context input='tex'>                    
+                    <MathJax.Node>{calculationDetails}</MathJax.Node>
+                </MathJax.Context>
+            </div>
+            )}
+        </div>
+    )}
     </div>
 </div>
 

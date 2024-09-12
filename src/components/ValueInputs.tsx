@@ -41,44 +41,5 @@ interface InputOperationTypeProps {
   handleCalculate: () => void; // Renommé pour la clarté
 }
 
-const InputOperationType: React.FC<InputOperationTypeProps> = ({ setOperationType, handleCalculate }) => {
-  const [selectedOperation, setSelectedOperation] = useState<string | null>(null);
-
-  const handleChange = (value: string | null) => {
-    setSelectedOperation(value);
-    setOperationType(value);
-  };
-
-  return (
-    <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-end', gap: '10px', width: '100%' }}>
-      <Select
-        mt="md"
-        comboboxProps={{ withinPortal: true }}
-        data={[
-          'Combined (Intersection with independants events)',
-          'Soustraction (Privation with inclued events)',
-          'Multichance of independants events (Union)',
-          'Multichance of dependants events (Union)',
-        ]}
-        placeholder="Pick one"
-        label="Operation"
-        onChange={handleChange}
-        style={{ width: '400px' }} // Fixer la largeur du Select à 200px
-      />
-      <div style={{ width: '150px'}}> {/* Container pour le bouton à droite */}
-        {selectedOperation && (
-          <Button 
-            mt="md"
-            onClick={handleCalculate}
-            style={{ whiteSpace: 'nowrap' }} // Pour empêcher le texte de se couper
-          >
-            Calculate Operation
-          </Button>
-        )}
-      </div>
-    </div>
-  );
-
-};
-export { InputOperationType, InputBetNumber, InputIssuesNumber};
+export {InputBetNumber, InputIssuesNumber};
 
