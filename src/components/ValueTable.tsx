@@ -28,6 +28,7 @@ const TableInput: React.FC<{
   const [intersectionOdds, setIntersectionOdds] = useState<string[]>([]);
   const [canCalculate, setCanCalculate] = useState(false);
   const [newOdds, setNewOdds] = useState<string[][]>([]); // Type string[][] pour un tableau de tableaux
+  const [selectedOperation, setSelectedOperation] = useState<string | null>(null);
 
   useEffect(() => {
     const initialData = Array.from({ length: betNumber }, (_, index) => ({
@@ -72,6 +73,11 @@ const TableInput: React.FC<{
           : item
       )
     );
+  };
+
+  const handleOperationChange = (value: string | null) => {
+    setSelectedOperation(value);
+    setOperationType(value);
   };
 
   const toggleRow = (id: string) =>
@@ -183,7 +189,7 @@ const TableInput: React.FC<{
     });
   };
 
-  const handleCalculate = () => {
+  const handleOperationCalculate = () => {
     console.log(newOdds)
     // Filtrer les données pour inclure uniquement les lignes sélectionnées avec Odds 1
     const filteredData = data.filter((item, index) =>
@@ -262,27 +268,51 @@ const TableInput: React.FC<{
                 label=""
                 placeholder="Method"
                 data={['EM', 'MPTO', 'SHIN', 'OR', 'LOG']}
+                defaultValue="EM"
                 style={{ width: '100px' }} // Réduire la largeur du Select
             />
         </div>
-        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-end', gap: '10px', width: '100%' }}>
-  {showOperationType && (
-    <InputOperationType setOperationType={setOperationType} handleCalculate={handleCalculate} />
-  )}
-  {calculationDetails && (
-    <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-end' }}>
-      <Text mt="md">
-        {calculationDetails}
-      </Text>
+        {showOperationType && (
+            <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-end', gap: '10px', width: '100%' }}>
+                <Select
+                mt="md"
+                comboboxProps={{ withinPortal: true }}
+                data={[
+                    'Combined (Intersection with independants events)',
+                    'Soustraction (Privation with inclued events)',
+                    'Multichance of independants events (Union)',
+                    'Multichance of dependants events (Union)',
+                ]}
+                placeholder="Pick one"
+                label="Operation"
+                onChange={handleOperationChange}
+                style={{ width: '400px' }} // Fixer la largeur du Select à 200px
+                />
+                {selectedOperation && (
+                    <div style={{  display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '10px'}}> {/* Container pour le bouton à droite */}
+                    <Button 
+                    mt="md"
+                    onClick={handleOperationCalculate}
+                    style={{ whiteSpace: 'nowrap' }} // Pour empêcher le texte de se couper
+                    >
+                    Calculate Operation
+                    </Button>
+                            {calculationDetails && (
+                                <div>
+                                <Text mt="md">
+                                    {calculationDetails}
+                                </Text>
+                                </div>
+                            )}
+                        
+                    </div>
+                )}
+            </div>
+        )}
     </div>
-  )}
 </div>
 
-
-      </div>
-    </div>
-
-  );
+);
 };
 
 export default TableInput;
