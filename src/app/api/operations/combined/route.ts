@@ -2,9 +2,9 @@ import { NextResponse } from 'next/server';
 
 export const calculateMultiplication = (data: { odds: string[][] }) => {
     console.log('Input data for calculation:', data);
-      const odds = data.odds.map((row: string[]) => parseFloat(row[0]));
+    const odds = data.odds.map((row: string[]) => parseFloat(row[0]));
     console.log('Parsed odd1 values:', odds);
-      if (odds.some(isNaN)) {
+    if (odds.some(isNaN)) {
       console.log('Invalid odds detected:', odds);
       return { result: '0.00', details: 'Some odds are invalid.' };
     }
@@ -32,7 +32,6 @@ export async function POST(req: Request) {
     const body = await req.json();
     console.log('Received request body:', body);
 
-    // Validate the body structure
     if (!body || !Array.isArray(body.odds) || body.odds.some((row: string[]) => !Array.isArray(row))) {
       console.log('Validation failed for body:', body);
       return NextResponse.json(
@@ -41,7 +40,6 @@ export async function POST(req: Request) {
       );
     }
 
-    // Call the function to calculate the result
     const { result, details } = calculateMultiplication(body);
     console.log('Calculation result and details:', { result, details });
 

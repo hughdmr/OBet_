@@ -189,6 +189,37 @@ const TableInput: React.FC<{
     });
   };
 
+  const sendDataToApi = async (operation: string, filteredData: any) => {
+    try {
+      const url = `http://localhost:3000/api/operations/${operation}`;
+      console.log(`Sending data to ${url}:`, filteredData);
+  
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ odds: filteredData.map((item: any) => item.odds) }),
+      });
+  
+      console.log('Response Status:', response.status);
+  
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Error response:', errorText);
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+  
+      const jsonResponse = await response.json();
+      console.log('Response JSON:', jsonResponse);
+  
+      return jsonResponse;
+    } catch (error) {
+      console.error('Error during fetch operation:', error);
+      return { result: 'Error occurred while fetching the data.', details: '' };
+    }
+  };
+
   const handleOperationCalculate = async () => {
     console.log('New Odds:', newOdds);
 
@@ -204,64 +235,31 @@ const TableInput: React.FC<{
     }));
   
     console.log('Filtered Data:', filteredData); // Debugging line
-
-    let result, details;
+    
     switch (operationType) {
         case 'Combined (Intersection with independants events)':
-          try {
-            console.log('Sending data to /combined API:', filteredData);
-            
-            const response = await fetch('http://localhost:3000/api/operations/combined', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({ odds: filteredData.map(item => item.odds) }), // Assurez-vous que le format correspond à ce que l'API attend
-            });
+            const combinedResponse = await sendDataToApi('combined', filteredData);
+            setCalculationDetails(combinedResponse.details);
+            setOperationResult(combinedResponse.result);
+            break;
       
-            console.log('Response Status:', response.status);
+        case 'Subtraction (Privation with inclued events)':
+            const subtractionResponse = await sendDataToApi('substraction', filteredData);
+            setCalculationDetails(subtractionResponse.details);
+            setOperationResult(subtractionResponse.result);
+            break;
 
-            if (!response.ok) {
-              const errorText = await response.text();
-              console.error('Error response:', errorText);
-              throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-      
-            const jsonResponse = await response.json();
-            console.log('Response JSON:', jsonResponse);
+        case 'Multichance of dependants events (Union)':
+            const unionDepResponse = await sendDataToApi('union-dep', filteredData);
+            setCalculationDetails(unionDepResponse.details);
+            setOperationResult(unionDepResponse.result);
+            break;
 
-            ({ result, details } = jsonResponse);
-            setCalculationDetails(details);
-            setOperationResult(result);
-          } catch (error) {
-            console.error('Error during fetch operation:', error);
-            setCalculationDetails('Error occurred while fetching the data.');
-          }
-          break;
-        
-        case 'Soustraction (Privation with inclued events)':
-          console.log('Calling calculateSubtraction with filteredData:', filteredData);
-          ({ result, details } = calculateSubtraction(filteredData));
-          console.log('Subtraction Result:', result, 'Details:', details);
-          setCalculationDetails(details);
-          setOperationResult(result);
-          break;
-
-        case 'Multichance of dependants events (Union : P(A∪B) = P(A)+P(B)-P(A∩B))':
-          console.log('Calling calculateUnion with dependants:', filteredData, intersectionOdds.map(Number));
-          ({ result, details } = calculateUnion('dependants', filteredData, intersectionOdds.map(Number)));
-          console.log('Union Result:', result, 'Details:', details);
-          setCalculationDetails(details);
-          setOperationResult(result);
-          break;
-
-        case 'Multichance of independants events (Union : P(A∪B) = P(A)+P(B)-P(A∩B) = P(A)+P(B)-P(A)xP(B))':
-          console.log('Calling calculateUnion with independants:', filteredData, []);
-          ({ result, details } = calculateUnion('independants', filteredData, []));
-          console.log('Union Result:', result, 'Details:', details);
-          setCalculationDetails(details);
-          setOperationResult(result);
-          break;
+        case 'Multichance of independants events (Union)':
+            const unionIndepResponse = await sendDataToApi('union-indep', filteredData);
+            setCalculationDetails(unionIndepResponse.details);
+            setOperationResult(unionIndepResponse.result);
+            break;
 
         default:
           console.warn('Unknown operation type:', operationType);
@@ -325,7 +323,7 @@ const TableInput: React.FC<{
                     comboboxProps={{ withinPortal: true }}
                     data={[
                         'Combined (Intersection with independants events)',
-                        'Soustraction (Privation with inclued events)',
+                        'Subtraction (Privation with inclued events)',
                         'Multichance of independants events (Union)',
                         'Multichance of dependants events (Union)',
                     ]}
