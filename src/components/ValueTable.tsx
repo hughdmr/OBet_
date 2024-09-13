@@ -335,25 +335,26 @@ const TableInput: React.FC<{
                     style={{ width: '400px' }}
                 />
                 {selectedOperation && (
-                <div style={{  display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '10px'}}> {/* Container pour le bouton à droite */}
-                    <Button
+                    <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-end', gap: '10px' }}> {/* Align items to bottom */}
+                        <Button
                         mt="md"
                         onClick={handleOperationCalculate}
                         style={{ whiteSpace: 'nowrap' }} // To prevent text wrapping
-                    >
+                        >
                         Calculate Operation
-                    </Button>
+                        </Button>
 
-                    {operationResult && (
-                    <div>
-                    <Text mt="md" style={{ marginLeft: '30px' }}>
-                        Result: {operationResult}
-                    </Text>
+                        {calculationDetails && (
+                        <div style={{ marginBottom: '-5px', marginLeft: '50px', border: '2px solid green', paddingLeft: '10px', paddingRight: '10px'}}> {/* Add margin to slightly lift the result */}
+                            <MathJax.Context input='tex'>
+                            <MathJax.Node>{operationResult}</MathJax.Node>
+                            </MathJax.Context>
+                        </div>
+                        )}
                     </div>
                     )}
-                </div>
-                )}
-            </div>
+                    </div>
+
             
             {/* Display calculation details on the next line */}
             {calculationDetails && (
