@@ -48,10 +48,10 @@ def format_json(date, teams, cotes, result):
     result["cotes"] = [cotes[0], cotes[1], cotes[2]]
     return result
     
-def save_data(matches):
+def save_data(matches, bookmaker):
     if not os.path.exists('./data'):
         os.mkdir('./data')
-    with open(f"./data/winamax-{time.time():.0f}.json", "w") as f:
+    with open(f"./data/{bookmaker}-{time.time():.0f}.json", "w") as f:
         json.dump(matches, f, ensure_ascii=False, indent=4)
         
 def get_soup(url):
@@ -69,3 +69,38 @@ def get_soup(url):
     html = driver.page_source
     soup = BeautifulSoup(html, 'html.parser')
     return soup
+
+def get_data(instance, max_delta=100):
+    
+    # Time analysis
+    temps = time.time()
+    
+    # If never scrapped, the fetch data
+    if not os.path.exists('./data'):
+        os.mkdir('./data')
+        
+    def get_name(str_json):
+        return str(str_json.split('.')[0].split('-')[0])
+
+    def get_time(str_json):
+        return int(str_json.split('.')[0].split('-')[1])
+        
+    liste_temps = [get_time(i) for i in os.listdir("./data/") if get_name(i) == instance.name]
+    
+    if len(liste_temps) > 0:
+        temps_max = max(liste_temps)
+    else:
+        temps_max = 0
+    
+    # If the last scrap last for more than one minute, scrap again
+    if temps-temps_max > max_delta:
+        print(f"[{instance.name.upper()}] Saved data is too old, fetch data again")
+        Match_List = instance.save_match_list()
+        if os.path.exists(f"./data/{instance.name}-{temps_max}.json"):
+            os.remove(f"./data/{instance.name}-{temps_max}.json")
+    # Else, only load the Json file
+    else:
+        with open(f"./data/{instance.name}-{temps_max}.json", "r") as f:
+            Match_List = json.load(f)
+            print(f"[{instance.name.upper()}] Saved data is recent, get saved data")
+    return Match_List

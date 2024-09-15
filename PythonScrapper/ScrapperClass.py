@@ -1,7 +1,7 @@
 from ScrappingUtils import *
 
 betclic_data = {
-    "name": "Betclic",
+    "name": "betclic",
     "url": 'https://www.betclic.fr/football-s1/top-football-europeen-p1',
     "matches": {
         "style": 'sports-events-event',
@@ -22,7 +22,7 @@ betclic_data = {
 }
 
 winamax_data = {
-    "name": "Winamax",
+    "name": "winamax",
     "url": 'https://www.winamax.fr/paris-sportifs/1',
     "matches": {
         "style": 'div',
@@ -87,10 +87,12 @@ class scrapper():
     
     def save_match_list(self):
         Match_List = self.get_match_list()
-        save_data(Match_List)  
-        print(f"[{self.name.upper()}] Data saved")  
+        save_data(Match_List, self.name)
+        print(f"[{self.name.upper()}] Data saved")
+        return Match_List
     
 if __name__ == '__main__':
     winamax = scrapper(winamax_data)
-    winamax.save_match_list()
-    # print(winamax.get_match_list())
+    print(get_data(winamax))
+    
+    
