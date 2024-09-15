@@ -1,5 +1,7 @@
 import chromedriver_autoinstaller
 from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+
 from bs4 import BeautifulSoup
 import os
 import json
@@ -53,8 +55,11 @@ def save_data(matches):
         json.dump(matches, f, ensure_ascii=False, indent=4)
         
 def get_soup(url):
-    #chromedriver_autoinstaller.install()
-    driver = webdriver.Chrome()
+    chromedriver_autoinstaller.install()
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")   
+    driver = webdriver.Chrome(options=chrome_options)
+    
     driver.get(url)
     print(f"[{url.split('.')[1].upper()}] Driver is connected...")
     
