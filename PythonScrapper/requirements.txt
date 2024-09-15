@@ -47,5 +47,6 @@ urllib3==2.2.1
 uvicorn==0.30.6
 uvloop==0.20.0
 watchfiles==0.24.0
+webdriver-manager==4.0.2
 websockets==13.0.1
 wsproto==1.2.0

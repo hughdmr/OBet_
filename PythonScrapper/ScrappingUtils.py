@@ -1,4 +1,5 @@
-import chromedriver_autoinstaller
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 
@@ -55,10 +56,12 @@ def save_data(matches, bookmaker):
         json.dump(matches, f, ensure_ascii=False, indent=4)
         
 def get_soup(url):
-    chromedriver_autoinstaller.install()
     chrome_options = Options()
     chrome_options.add_argument("--headless")   
-    driver = webdriver.Chrome(options=chrome_options)
+    chrome_options.add_argument("--no-sandbox")
+    
+    service = Service(ChromeDriverManager().install())
+    driver = webdriver.Chrome(service=service, options=chrome_options) 
     
     driver.get(url)
     print(f"[{url.split('.')[1].upper()}] Driver is connected...")
