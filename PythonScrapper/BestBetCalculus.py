@@ -1,5 +1,5 @@
 from itertools import combinations
-from SportOddsScrapping import scrapper_netbet, scrapper_betclic, scrapper_winamax
+from PythonScrapper.ScrapperClass import scrapper_netbet, scrapper_betclic, scrapper_winamax
 import os
 import time
 import json
