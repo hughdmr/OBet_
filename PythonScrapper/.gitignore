@@ -1,0 +1,15 @@
+# Data and cache
+__pycache__/
+data/
+
+# MacOS shit
+.DS_Store
+
+env/
+.env/
+venv/
+.venv/
+.env
+
+*.xlsx
+*.json
