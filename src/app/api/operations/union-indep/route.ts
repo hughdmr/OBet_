@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 
+// NOT WORKING 
 export const calculateUnionIndependants = (data: { odds: string[][] }) => {
   console.log('Input data for calculation:', data);
   

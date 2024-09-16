@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-const calculateFairOdds = (odds: number[]): number[] => {
+const calculateMPTO = (odds: number[]): number[] => {
   const n = odds.length;
   if (n === 1) {
     return odds;
@@ -26,7 +26,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const fairOdds = odds.map(row => calculateFairOdds(row));
+    const fairOdds = odds.map(row => calculateMPTO(row));
     console.log('calculated')
 
     return NextResponse.json({ fairOdds }, { status: 200 });

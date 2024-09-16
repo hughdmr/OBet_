@@ -7,9 +7,7 @@ import styles from './ValueInputs.module.css'; // Importation des styles CSS
 const TableInput: React.FC<{
   issuesNumber: number;
   betNumber: number;
-  operationType: string | null;
-  setOperationType: (value: string | null) => void;
-}> = ({ issuesNumber, betNumber, operationType, setOperationType }) => {
+}> = ({ issuesNumber, betNumber}) => {
   const [data, setData] = useState(() =>
     Array.from({ length: betNumber }, (_, index) => ({
       id: (index + 1).toString(),
@@ -21,13 +19,12 @@ const TableInput: React.FC<{
   const [selection, setSelection] = useState<string[]>([]);
   const [showNewRows, setShowNewRows] = useState(false);
   const [showOperationType, setShowOperationType] = useState(false);
-  const [showIntersectionField, setShowIntersectionField] = useState(false);
   const [calculationDetails, setCalculationDetails] = useState<string>('');
-  const [intersectionOdds, setIntersectionOdds] = useState<string[]>([]);
-  const [canCalculate, setCanCalculate] = useState(false);
   const [newOdds, setNewOdds] = useState<string[][]>([]); // Type string[][] pour un tableau de tableaux
   const [selectedOperation, setSelectedOperation] = useState<string | null>(null);
   const [operationResult, setOperationResult] = useState<string | null>(null); // New state for result
+  const [operationType, setOperationType] = useState<string | null>(null);
+  const [foType, setFOType] = useState<string | null>('MPTO');
 
 
   useEffect(() => {
@@ -43,9 +40,6 @@ const TableInput: React.FC<{
     setShowOperationType(false);
     setOperationType(null);
     setCalculationDetails('');
-    setShowIntersectionField(false);
-    setIntersectionOdds([]);
-    setCanCalculate(false);
   }, [betNumber, issuesNumber]);  
 
   useEffect(() => {
@@ -80,6 +74,10 @@ const TableInput: React.FC<{
     setOperationType(value);
   };
 
+  const handleFOChange = (value: string | null) => {
+    setFOType(value);
+  };
+
   const toggleRow = (id: string) =>
     setSelection((current) =>
       current.includes(id) ? current.filter((item) => item !== id) : [...current, id]
@@ -87,36 +85,6 @@ const TableInput: React.FC<{
 
   const toggleAll = () =>
     setSelection((current) => (current.length === data.length ? [] : data.map((item) => item.id)));
-
-  const fetchNewOdds = async () => {
-    try {
-      const oddsData = data.map(row => row.odds.map(odd => parseFloat(odd)));
-  
-      const response = await fetch('http://localhost:3000/api/fair-odd', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ odds: oddsData }),
-      });
-  
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-  
-      const text = await response.text();
-      if (!text) {
-        console.error('La réponse est vide.');
-        return;
-      }
-  
-      const result = JSON.parse(text);
-      setNewOdds(result.fairOdds);
-      setShowNewRows(true); // Assurez-vous que les nouvelles lignes sont affichées
-    } catch (error) {
-      console.error('Erreur lors de la récupération des données :', error);
-    }
-  };
   
   const rows = data.flatMap((item, matchIndex) => {
     const selected = selection.includes(item.id);
@@ -179,17 +147,85 @@ const TableInput: React.FC<{
   
     return [originalRow, newRow].filter(Boolean);
   });
-  
 
-  const handleIntersectionChange = (index: number, value: string) => {
-    setIntersectionOdds((prevOdds) => {
-      const newOdds = [...prevOdds];
-      newOdds[index] = value;
-      return newOdds;
-    });
+  const sendDataToFOAPI = async (fo: string, oddData: any) => {
+    try{
+        const url = `http://localhost:3000/api/fair-odd/${fo}`;
+        console.log(`Sending data to ${url}:`, oddData);
+    
+        const response = await fetch(url, {
+            method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ odds: oddData }),
+      });
+    
+        console.log('Response Status:', response.status);
+    
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('Error response:', errorText);
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const text = await response.text();
+        if (!text) {
+            console.error('Empty response')
+            return ;
+        }
+    
+        const result = JSON.parse(text);
+        console.log('Result:', result);
+    
+        return result;
+        } catch (error) {
+        console.error('Error during fetch operation:', error);
+        return { result: 'Error occurred while fetching the data.', details: '' };
+        }
   };
 
-  const sendDataToApi = async (operation: string, filteredData: any) => {
+  const handleFOCalculate = async () => {
+
+    const oddsData = data.map(row => row.odds.map(odd => parseFloat(odd)));
+  
+    console.log('Odds Data:', oddsData);
+
+    let response;
+    
+    switch (foType) {
+        case 'MPTO':
+            response = await sendDataToFOAPI('mpto', oddsData);
+            break;
+      
+        case 'EM':
+            response = await sendDataToFOAPI('em', oddsData);
+            break;
+
+        case 'OR':
+            response = await sendDataToFOAPI('or', oddsData);
+            break;
+
+        case 'LOG':
+            response = await sendDataToFOAPI('log', oddsData);
+            break;
+
+        case 'SHIN':
+            response = await sendDataToFOAPI('shin', oddsData);
+            break;
+
+        default:
+          console.warn('Unknown fo type:', foType);
+          break;
+    }
+
+    if (response) {
+        setNewOdds(response.fairOdds);
+        setShowNewRows(true); 
+    }
+};
+
+  const sendDataToOperationApi = async (operation: string, filteredData: any) => {
     try {
       const url = `http://localhost:3000/api/operations/${operation}`;
       console.log(`Sending data to ${url}:`, filteredData);
@@ -222,51 +258,42 @@ const TableInput: React.FC<{
 
   const handleOperationCalculate = async () => {
     console.log('New Odds:', newOdds);
-
-    // Filtrer les données pour inclure uniquement les lignes sélectionnées avec Odds 1
     const filteredData = data
-    .filter((item, index) => 
-      selection.includes(item.id) && 
-      newOdds[index]?.[0] !== undefined // Vérifie si le Odds 1 est défini pour la ligne
-    )
-    .map((item, index) => ({
-      ...item,
-      odds: newOdds[index], // Remplacer l'ancien odds par le nouveau odds depuis newOdds
-    }));
-  
-    console.log('Filtered Data:', filteredData); // Debugging line
-    
+      .filter((item, index) => 
+        selection.includes(item.id) && 
+        newOdds[index]?.[0] !== undefined 
+      )
+      .map((item, index) => ({
+        ...item,
+        odds: newOdds[index],
+      }));
+
+    console.log('Filtered Data:', filteredData); 
+
+    let response;
+
     switch (operationType) {
         case 'Combined (Intersection with independants events)':
-            const combinedResponse = await sendDataToApi('combined', filteredData);
-            setCalculationDetails(combinedResponse.details);
-            setOperationResult(combinedResponse.result);
+            response = await sendDataToOperationApi('combined', filteredData);
             break;
-      
         case 'Subtraction (Privation with inclued events)':
-            const subtractionResponse = await sendDataToApi('substraction', filteredData);
-            setCalculationDetails(subtractionResponse.details);
-            setOperationResult(subtractionResponse.result);
+            response = await sendDataToOperationApi('substraction', filteredData);
             break;
-
-        case 'Multichance of dependants events (Union)':
-            const unionDepResponse = await sendDataToApi('union-dep', filteredData);
-            setCalculationDetails(unionDepResponse.details);
-            setOperationResult(unionDepResponse.result);
-            break;
-
         case 'Multichance of independants events (Union)':
-            const unionIndepResponse = await sendDataToApi('union-indep', filteredData);
-            setCalculationDetails(unionIndepResponse.details);
-            setOperationResult(unionIndepResponse.result);
+            response = await sendDataToOperationApi('union-indep', filteredData);
             break;
-
         default:
-          console.warn('Unknown operation type:', operationType);
-          setCalculationDetails('');
-          break;
+            console.warn('Unknown operation type:', operationType);
+            response = { details: '', result: '' };
+            break;
+    }
+
+    if (response) {
+        setCalculationDetails(response.details);
+        setOperationResult(response.result);
     }
 };
+
 
 
     return (
@@ -302,7 +329,7 @@ const TableInput: React.FC<{
                 onClick={() => {
                     setShowNewRows(true);
                     setShowOperationType(true);
-                    fetchNewOdds(); // Appeler la fonction pour récupérer les données de la route
+                    handleFOCalculate(); // Appeler la fonction pour récupérer les données de la route
                 }}
             >
                 Calculate Fair Odds
@@ -310,8 +337,9 @@ const TableInput: React.FC<{
             <Select
                 label=""
                 placeholder="Method"
-                data={['EM', 'MPTO', 'SHIN', 'OR', 'LOG']}
-                defaultValue="EM"
+                data={['MPTO', 'EM' , 'SHIN', 'OR', 'LOG']}
+                defaultValue="MPTO"
+                onChange={handleFOChange}
                 style={{ width: '100px' }} // Réduire la largeur du Select
             />
         </div>
@@ -325,7 +353,6 @@ const TableInput: React.FC<{
                         'Combined (Intersection with independants events)',
                         'Subtraction (Privation with inclued events)',
                         'Multichance of independants events (Union)',
-                        'Multichance of dependants events (Union)',
                     ]}
                     placeholder="Pick one"
                     label="Operation"
