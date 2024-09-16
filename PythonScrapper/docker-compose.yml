@@ -1,0 +1,17 @@
+version: '3'
+services:
+
+  selenium:
+    image: selenium/standalone-chrome
+    platform: linux/amd64
+    ports:
+    - 4444:4444
+
+  myapp:
+    build: ./
+    platform: linux/amd64
+    ports:
+      - 8000:8000
+    depends_on:
+      selenium:
+        condition: service_started

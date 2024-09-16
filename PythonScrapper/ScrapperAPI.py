@@ -4,10 +4,15 @@ from ScrappingUtils import get_data
 
 app = FastAPI()
 
+@app.get("/")
+async def root():
+    return "Les endpoint disponibles sont /winamax et /betclic"
+
 @app.get("/winamax")
 async def root():
-    winamax = scrapper(winamax_data)
-    return get_data(winamax)
+    return "Winamax endpoint is broken"
+    # winamax = scrapper(winamax_data)
+    # return get_data(winamax)
 
 
 @app.get("/betclic")

@@ -1,5 +1,3 @@
-from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 
@@ -57,11 +55,11 @@ def save_data(matches, bookmaker):
         
 def get_soup(url):
     chrome_options = Options()
-    chrome_options.add_argument("--headless")   
-    chrome_options.add_argument("--no-sandbox")
+    chrome_options.add_argument("--headless") 
+    chrome_options.add_argument('--disable-dev-shm-usage') 
     
-    service = Service(ChromeDriverManager().install())
-    driver = webdriver.Chrome(service=service, options=chrome_options) 
+    hub_url = "http://selenium:4444"
+    driver = webdriver.Remote(command_executor=hub_url, options=chrome_options)
     
     driver.get(url)
     print(f"[{url.split('.')[1].upper()}] Driver is connected...")
@@ -71,6 +69,7 @@ def get_soup(url):
     
     html = driver.page_source
     soup = BeautifulSoup(html, 'html.parser')
+    driver.quit()
     return soup
 
 def get_data(instance, max_delta=100):
