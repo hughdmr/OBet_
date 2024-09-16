@@ -1,8 +1,7 @@
 import React from 'react';
 import { NumberInput, Button } from '@mantine/core';
-import './ValueInputs.module.css';
+import classes from './ValueInputs.module.css';
 
-// Composant InputIssuesNumber
 const InputIssuesNumber: React.FC<{ setIssuesNumber: (value: number) => void }> = ({ setIssuesNumber }) => (
   <NumberInput
     label="Number of issues"
@@ -19,7 +18,6 @@ const InputIssuesNumber: React.FC<{ setIssuesNumber: (value: number) => void }> 
   />
 );
 
-// Composant InputBetNumber
 const InputBetNumber: React.FC<{ setBetNumber: (value: number) => void }> = ({ setBetNumber }) => (
   <NumberInput
     label="Number of matches"
@@ -47,6 +45,7 @@ const InputKellyOdd: React.FC<{ setKellyOdd: (value: number) => void }> = ({ set
     stepHoldDelay={500}
     stepHoldInterval={100}
     onChange={(value) => setKellyOdd(value as number)}
+    className={classes.inputKelly}
   />
 );
 
@@ -61,6 +60,7 @@ const InputKellyFOdd: React.FC<{ setKellyFOdd: (value: number) => void }> = ({ s
     stepHoldDelay={500}
     stepHoldInterval={100}
     onChange={(value) => setKellyFOdd(value as number)}
+    className={classes.inputKelly}
   />
 );
 
@@ -79,8 +79,8 @@ const handleValueCalculate = async (KellyOdd: number | null, KellyFOdd: number |
     console.log('Calculated Value:', data.calculatedValue);
     console.log('Calculated Stake:', data.kellyStake);
 
-    setResult(data.calculatedValue);
-    setKelly(data.kellyStake);
+    setResult(isNaN(data.calculatedValue)? '': (data.calculatedValue));
+    setKelly(isNaN(data.kellyStake)? '' : (data.kellyStake));
     setReco(isNaN(data.kellyStake / 2.5) ? '' : (data.kellyStake / 2.5).toFixed(2));
   } catch (error) {
     console.error('Error calculating value and stake:', error);

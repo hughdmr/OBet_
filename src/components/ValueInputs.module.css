@@ -1,27 +1,30 @@
-/* ValueInputs.module.css */
 .container {
   display: flex;
   flex-direction: column;
-  gap: 20px; /* Un espace raisonnable entre chaque élément */
-  height: auto; /* S'assure que le conteneur n'étend pas la hauteur */
+  gap: 20px;
+  height: auto;
 }
 
 .flexContainer {
   display: flex;
-  gap: 20px; /* Espace entre les inputs */
-  align-items: flex-end; /* Align items at the bottom */
+  gap: 20px; 
+  align-items: flex-end; 
 }
 
 
 .resultText {
-  margin-left: 10px; /* Add space between button and result text */
+  margin-left: 10px;
+  font-size:10px;
 }
 
+.inputKelly {
+  width: 120px;
+}
 
 .scrollable {
   width: 100%; 
-  overflow-x: auto; /* Permet le défilement horizontal si nécessaire */
-  max-height: 100%; /* Ajuste la hauteur pour éviter des comportements inattendus */
+  overflow-x: auto;
+  max-height: 100%; 
 }
 
 .tableContainer {
@@ -40,16 +43,16 @@
 }
 
 .thMatches{
-  min-width: 140px;  /* largeur minimale */
-  max-width: 140px; /* largeur maximale */
+  min-width: 140px; 
+  max-width: 140px; 
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .thOdd, .tdInput {
-  min-width: 100px;  /* largeur minimale */
-  max-width: 100px; /* largeur maximale */
+  min-width: 100px;
+  max-width: 100px; 
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -67,19 +70,14 @@
   background-color: #f0f8f0;
 }
 
-/* Ajoutez cette classe à ValueInputs.module.css */
 .highlightOdd1 {
-  border: 2px solid green; /* Contour vert */
+  border: 2px solid green;
 }
 
-/* ValueInputs.module.css */
-
-/* Style pour les cases à cocher sélectionnées en gris clair */
 .checkboxChecked input[type="checkbox"]:checked {
-  border-color: #f5f5f5; /* Gris plus foncé pour la bordure */
+  border-color: #f5f5f5; 
 }
 
-/* Style pour le conteneur de la case à cocher */
 .checkboxChecked {
   display: inline-block;
 }

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Table, TextInput, Checkbox, Button, Text, Select } from '@mantine/core';
 import cx from 'clsx';
 import MathJax from 'react-mathjax2';
-import styles from './ValueInputs.module.css'; // Importation des styles CSS
+import styles from './ValueInputs.module.css';
 
 const TableInput: React.FC<{
   issuesNumber: number;
@@ -20,9 +20,9 @@ const TableInput: React.FC<{
   const [showNewRows, setShowNewRows] = useState(false);
   const [showOperationType, setShowOperationType] = useState(false);
   const [calculationDetails, setCalculationDetails] = useState<string>('');
-  const [newOdds, setNewOdds] = useState<string[][]>([]); // Type string[][] pour un tableau de tableaux
+  const [newOdds, setNewOdds] = useState<string[][]>([]);
   const [selectedOperation, setSelectedOperation] = useState<string | null>(null);
-  const [operationResult, setOperationResult] = useState<string | null>(null); // New state for result
+  const [operationResult, setOperationResult] = useState<string | null>(null);
   const [operationType, setOperationType] = useState<string | null>(null);
   const [foType, setFOType] = useState<string | null>('MPTO');
 
@@ -35,7 +35,7 @@ const TableInput: React.FC<{
     }));
   
     setData(initialData);
-    setSelection(initialData.map(item => item.id)); // Initialiser les cases à cocher comme cochées
+    setSelection(initialData.map(item => item.id));
     setShowNewRows(false);
     setShowOperationType(false);
     setOperationType(null);
@@ -317,7 +317,7 @@ const TableInput: React.FC<{
                 onClick={() => {
                     setShowNewRows(true);
                     setShowOperationType(true);
-                    handleFOCalculate(); // Appeler la fonction pour récupérer les données de la route
+                    handleFOCalculate();
                 }}
             >
                 Calculate Fair Odds
@@ -328,7 +328,7 @@ const TableInput: React.FC<{
                 data={['MPTO', 'EM']}
                 defaultValue="MPTO"
                 onChange={handleFOChange}
-                style={{ width: '100px' }} // Réduire la largeur du Select
+                style={{ width: '100px' }} 
             />
         </div>
         {showOperationType && (
@@ -348,11 +348,11 @@ const TableInput: React.FC<{
                     style={{ width: '400px' }}
                 />
                 {selectedOperation && (
-                    <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-end', gap: '10px' }}> {/* Align items to bottom */}
+                    <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-end', gap: '10px' }}>
                         <Button
                         mt="md"
                         onClick={handleOperationCalculate}
-                        style={{ whiteSpace: 'nowrap' }} // To prevent text wrapping
+                        style={{ whiteSpace: 'nowrap' }}
                         >
                         Calculate Operation
                         </Button>
@@ -369,9 +369,8 @@ const TableInput: React.FC<{
                     </div>
 
             
-            {/* Display calculation details on the next line */}
             {calculationDetails && (
-            <div style={{ marginTop: '10px', textAlign: 'left'}}> {/* Add some margin to separate it from the button */}
+            <div style={{ marginTop: '10px', textAlign: 'left'}}>
                 <MathJax.Context input='tex'>                    
                     <MathJax.Node>{calculationDetails}</MathJax.Node>
                 </MathJax.Context>
