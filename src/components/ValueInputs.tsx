@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { NumberInput, Select, Button } from '@mantine/core';
+import React from 'react';
+import { NumberInput, Button } from '@mantine/core';
 import './ValueInputs.module.css';
 
 // Composant InputIssuesNumber
@@ -36,10 +36,77 @@ const InputBetNumber: React.FC<{ setBetNumber: (value: number) => void }> = ({ s
   />
 );
 
-interface InputOperationTypeProps {
-  setOperationType: (value: string | null) => void;
-  handleCalculate: () => void; // Renommé pour la clarté
-}
+const InputKellyOdd: React.FC<{ setKellyOdd: (value: number) => void }> = ({ setKellyOdd }) => (
+  <NumberInput
+    label="Odd"
+    description="Odd you want to calculate value"
+    clampBehavior="strict"
+    hideControls
+    min={1}
+    allowDecimal={true}
+    stepHoldDelay={500}
+    stepHoldInterval={100}
+    onChange={(value) => setKellyOdd(value as number)}
+  />
+);
 
-export {InputBetNumber, InputIssuesNumber};
+const InputKellyFOdd: React.FC<{ setKellyFOdd: (value: number) => void }> = ({ setKellyFOdd }) => (
+  <NumberInput
+    label="Fair Odd"
+    description="Fair Odd you want to compare with"
+    clampBehavior="strict"
+    hideControls
+    min={1}
+    allowDecimal={true}
+    stepHoldDelay={500}
+    stepHoldInterval={100}
+    onChange={(value) => setKellyFOdd(value as number)}
+  />
+);
+
+const handleValueCalculate = async (KellyOdd: number | null, KellyFOdd: number | null, setResult: any, setKelly: any, setReco: any) => {
+  try {
+    const response = await fetch('/api/value', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ KellyOdd, KellyFOdd }),
+    });
+
+    const data = await response.json();
+
+    console.log('Calculated Value:', data.calculatedValue);
+    console.log('Calculated Stake:', data.kellyStake);
+
+    setResult(data.calculatedValue);
+    setKelly(data.kellyStake);
+    setReco(isNaN(data.kellyStake / 2.5) ? '' : (data.kellyStake / 2.5).toFixed(2));
+  } catch (error) {
+    console.error('Error calculating value and stake:', error);
+  }
+};
+
+const CalculKellyButton = ({
+  KellyOdd,
+  KellyFOdd,
+  setResult,
+  setKelly,
+  setReco,
+}: {
+  KellyOdd: number | null;
+  KellyFOdd: number | null;
+  setResult: any;
+  setKelly: any;
+  setReco: any;
+}) => {
+  return(
+    <Button mt="md" onClick={() => handleValueCalculate(KellyOdd, KellyFOdd, setResult, setKelly, setReco)}>
+    Calculate Value
+  </Button>
+  );
+};
+
+
+export {InputBetNumber, InputIssuesNumber, InputKellyOdd, InputKellyFOdd, CalculKellyButton};
 

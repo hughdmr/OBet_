@@ -9,6 +9,12 @@
 .flexContainer {
   display: flex;
   gap: 20px; /* Espace entre les inputs */
+  align-items: flex-end; /* Align items at the bottom */
+}
+
+
+.resultText {
+  margin-left: 10px; /* Add space between button and result text */
 }
 
 

@@ -202,18 +202,6 @@ const TableInput: React.FC<{
             response = await sendDataToFOAPI('em', oddsData);
             break;
 
-        case 'OR':
-            response = await sendDataToFOAPI('or', oddsData);
-            break;
-
-        case 'LOG':
-            response = await sendDataToFOAPI('log', oddsData);
-            break;
-
-        case 'SHIN':
-            response = await sendDataToFOAPI('shin', oddsData);
-            break;
-
         default:
           console.warn('Unknown fo type:', foType);
           break;
@@ -337,7 +325,7 @@ const TableInput: React.FC<{
             <Select
                 label=""
                 placeholder="Method"
-                data={['MPTO', 'EM' , 'SHIN', 'OR', 'LOG']}
+                data={['MPTO', 'EM']}
                 defaultValue="MPTO"
                 onChange={handleFOChange}
                 style={{ width: '100px' }} // Réduire la largeur du Select
