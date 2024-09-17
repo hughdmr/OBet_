@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Table, TextInput, Checkbox, Button, Text, Select } from '@mantine/core';
+import { Table, TextInput, Checkbox, Button, Select } from '@mantine/core';
 import cx from 'clsx';
 // @ts-ignore
 import MathJax from 'react-mathjax2';

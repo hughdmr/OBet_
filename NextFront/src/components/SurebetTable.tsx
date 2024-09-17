@@ -1,105 +1,143 @@
 import React, { useState, useEffect } from 'react';
-import { Table, TextInput, Checkbox, Button, Text, Select } from '@mantine/core';
-import cx from 'clsx';
-import styles from './ValueInputs.module.css';
+import { Table, TextInput, Radio, Checkbox } from '@mantine/core'; // replace with actual imports
 
 const SurebetTable: React.FC<{
   issuesNumber: number;
-  betNumber: number;
-}> = ({ issuesNumber, betNumber}) => {
-  const [data, setData] = useState(() =>
-    Array.from({ length: betNumber }, (_, index) => ({
-      id: (index + 1).toString(),
-      match: `Match ${index + 1}`,
-      odds: Array.from({ length: issuesNumber }, () => issuesNumber.toString()),
-    }))
+}> = ({ issuesNumber }) => {
+  const [selectedRadio, setSelectedRadio] = useState<number | null>(null);
+  const [checkboxStates, setCheckboxStates] = useState(
+    Array.from({ length: issuesNumber }, () => false)
   );
 
+  // Set default values for odds to 2 and stakes to 10
+  const [data, setData] = useState(() => ({
+    id: '1',
+    match: 'Match',
+    odds: Array.from({ length: issuesNumber }, () => issuesNumber), // Default value of 2 for odds
+    stakes: Array.from({ length: issuesNumber }, () => '10'), // Default value of 10 for stakes
+  }));
+
   useEffect(() => {
-    const initialData = Array.from({ length: betNumber }, (_, index) => ({
-      id: (index + 1).toString(),
-      match: `Match ${index + 1}`,
-      odds: Array.from({ length: issuesNumber }, () => issuesNumber.toString()),
+    setData({
+      id: '1',
+      match: 'Match',
+      odds: Array.from({ length: issuesNumber }, () => issuesNumber), // Default value of 2 for odds
+      stakes: Array.from({ length: issuesNumber }, () => '10'), // Default value of 10 for stakes
+    });
+  }, [issuesNumber]);
+
+  const handleInputChange = (index: number, value: string, type: 'odds' | 'stakes') => {
+    setData((prevData) => ({
+      ...prevData,
+      [type]: prevData[type].map((entry, i) => (i === index ? value : entry)),
     }));
-  
-    setData(initialData);
-  }, [betNumber, issuesNumber]);  
+  };
 
+  const handleRadioChange = (index: number) => {
+    setSelectedRadio(index);
+  };
 
-  const handleInputChange = (id: string, index: number, value: string) => {
-    setData((prevData) =>
-      prevData.map((item) =>
-        item.id === id
-          ? {
-              ...item,
-              odds: item.odds.map((odd, i) => (i === index ? value : odd)),
-            }
-          : item
-      )
+  const handleCheckboxChange = (index: number) => {
+    setCheckboxStates((prevState) =>
+      prevState.map((checked, i) => (i === index ? !checked : checked))
     );
   };
 
-  const handleMatchChange = (id: string, value: string) => {
-    setData((prevData) =>
-      prevData.map((item) =>
-        item.id === id
-          ? { ...item, match: value }
-          : item
-      )
-    );
-  };
-  
-  const rows = data.flatMap((item, matchIndex) => {
-  
-    const originalRow = (
-      <Table.Tr key={item.id}>
-        <Table.Td className={styles.tdInput}>
+  const oddsRow = (
+    <Table.Tr>
+      <Table.Td>{data.match}</Table.Td>
+      {data.odds.map((odd, index) => (
+        <Table.Td key={`odd-${index}`}>
           <TextInput
             type="text"
-            value={item.match}
-            onChange={(e) => handleMatchChange(item.id, e.target.value)}
-            style={{ width: '100%' }}
+            value={odd}
+            onChange={(e) => handleInputChange(index, e.target.value, 'odds')}
           />
         </Table.Td>
-        {item.odds.map((odd, index) => (
-          <Table.Td key={index} className={styles.tdInput}>
-            <TextInput
-              type="text"
-              value={odd}
-              onChange={(e) => handleInputChange(item.id, index, e.target.value)}
-              style={{ width: '100%' }}
-            />
-          </Table.Td>
-        ))}
-      </Table.Tr>
-    );
-  
-    return originalRow;
-  });
+      ))}
+    </Table.Tr>
+  );
 
+  const stakesRow = (
+    <Table.Tr>
+      <Table.Td>Stake</Table.Td>
+      {data.stakes.map((stake, index) => (
+        <Table.Td key={`stake-${index}`}>
+          <TextInput
+            type="text"
+            value={stake}
+            onChange={(e) => handleInputChange(index, e.target.value, 'stakes')}
+          />
+        </Table.Td>
+      ))}
+    </Table.Tr>
+  );
 
-    return (
+  const radioRow = (
+    <Table.Tr>
+      <Table.Td>Fix Profit</Table.Td>
+      {data.odds.map((_, index) => (
+        <Table.Td key={`radio-${index}`}>
+          <Radio
+            name="oddsRadio"
+            checked={selectedRadio === index}
+            onChange={() => handleRadioChange(index)}
+          />
+        </Table.Td>
+      ))}
+    </Table.Tr>
+  );
+
+  const checkboxRow = (
+    <Table.Tr>
+      <Table.Td>Share Profit</Table.Td>
+      {data.odds.map((_, index) => (
+        <Table.Td key={`checkbox-${index}`}>
+          <Checkbox
+            checked={checkboxStates[index]}
+            onChange={() => handleCheckboxChange(index)}
+          />
+        </Table.Td>
+      ))}
+    </Table.Tr>
+  );
+
+  const fifthRow = (
+    <Table.Tr>
+      <Table.Td>Benefits</Table.Td>
+      {data.odds.map((_, index) => (
+        <Table.Td key={`fifth-${index}`}>
+          {/* Customize this fifth row as needed */}
+        </Table.Td>
+      ))}
+    </Table.Tr>
+  );
+
+  return (
     <div>
-      <div className={styles.tableContainer}>
-        <div className={styles.tableWrapper}>
-          <Table className={styles.table}>
+      <div className="table-container">
+        <div className="table-wrapper">
+          <Table>
             <Table.Thead>
               <Table.Tr>
-                <Table.Th className={styles.thMatches}>Matches</Table.Th>
+                <Table.Th>Matches</Table.Th>
                 {Array.from({ length: issuesNumber }, (_, index) => (
-                  <Table.Th key={index} className={styles.thOdd}>Odd {index + 1}</Table.Th>
+                  <Table.Th key={`header-${index}`}>Odd {index + 1}</Table.Th>
                 ))}
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>
-              {rows}
+              {oddsRow}
+              {stakesRow}
+              {radioRow}
+              {checkboxRow}
+              {fifthRow}
             </Table.Tbody>
           </Table>
         </div>
       </div>
-</div>
-
-);
+    </div>
+  );
 };
 
 export default SurebetTable;

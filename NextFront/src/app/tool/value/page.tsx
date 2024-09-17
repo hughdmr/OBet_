@@ -1,9 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import { InputBetNumber, InputIssuesNumber, InputKellyOdd, InputKellyFOdd, CalculKellyButton } from '../../../components/ValueInputs';
-import TableInput from '../../../components/ValueTable';
-import classes from '../../../components/ValueInputs.module.css';
+import { InputKellyOdd, InputKellyFOdd } from '../../../components/value/KellysInput';
+import { CalculKellyButton } from '../../../components/value/KellysCalcul';
+import { InputBetNumber } from '../../../components/value/BetsInput';
+import { InputIssuesNumber } from '../../../components/value/IssuesInput';
+import TableInput from '../../../components/value/ValueTable';
+import classes from '../../../components/value/ValueInputs.module.css';
 // @ts-ignore
 import MathJax from 'react-mathjax2';
 
