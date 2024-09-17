@@ -5,6 +5,7 @@ import { Text } from '@mantine/core';
 import { InputBetNumber, InputIssuesNumber, InputKellyOdd, InputKellyFOdd, CalculKellyButton } from '../../../components/ValueInputs';
 import TableInput from '../../../components/ValueTable';
 import classes from '../../../components/ValueInputs.module.css';
+// @ts-ignore
 import MathJax from 'react-mathjax2';
 
 export default function Home() {
@@ -29,12 +30,12 @@ export default function Home() {
         <InputKellyOdd setKellyOdd={setKellyOdd}/>
         <InputKellyFOdd setKellyFOdd={setKellyFOdd} />
         <CalculKellyButton KellyOdd={KellyOdd} KellyFOdd={KellyFOdd} setResult={setResult} setKelly={setKelly} setReco={setReco}/>
-        <div style={{ marginBottom: '-5px', border: '2px solid green', padding: '10px'}}>
         {result !== null && (
+        <div style={{ marginBottom: '-5px', border: '2px solid green', padding: '10px'}}>
           <MathJax.Context className={classes.resultText} >
             <MathJax.Node>{`\\text{Value} : ${result}%`}</MathJax.Node>
           </MathJax.Context>
-          )}
+
         {kelly !== null && (
            <MathJax.Context className={classes.resultText} >
            <MathJax.Node>{`\\text{Kelly Stake} : ${kelly}%`}</MathJax.Node>
@@ -46,6 +47,7 @@ export default function Home() {
           </MathJax.Context>          
         )}
         </div>
+        )}
       </div>
     </div>
   );
