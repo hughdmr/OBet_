@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { Text } from '@mantine/core';
 import { InputBetNumber, InputIssuesNumber, InputKellyOdd, InputKellyFOdd, CalculKellyButton } from '../../../components/ValueInputs';
 import TableInput from '../../../components/ValueTable';
 import classes from '../../../components/ValueInputs.module.css';
