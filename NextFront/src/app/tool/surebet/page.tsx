@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { InputIssuesNumber } from '../../../components/value/IssuesInput';
 import SurebetTable from '../../../components/SurebetTable';
-import classes from '../../../components/value/ValueInputs.module.css';
+import classes from '../../../components/SurebetTable.module.css';
 
 export default function Home() {
   const [issuesNumber, setIssuesNumber] = useState(2);
@@ -14,7 +14,7 @@ export default function Home() {
         <InputIssuesNumber setIssuesNumber={setIssuesNumber} />
       </div>
       <div className={classes.scrollable}>
-        <SurebetTable issuesNumber={issuesNumber}/>
+        <SurebetTable issuesNumber={issuesNumber} />
       </div>
     </div>
   );
