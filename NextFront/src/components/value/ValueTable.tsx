@@ -227,34 +227,41 @@ const TableInput: React.FC<{
 
   const handleOperationCalculate = async () => {
     console.log('New Odds:', newOdds);
-    const filteredData = data
-      .filter((item, index) => 
-        selection.includes(item.id) && 
-        newOdds[index]?.[0] !== undefined 
-      )
-      .map((item, index) => ({
-        ...item,
-        odds: newOdds[index],
-      }));
-
-    console.log('Filtered Data:', filteredData); 
-
     let response;
 
-    switch (operationType) {
-        case 'Combined (Intersection with independants events)':
-            response = await sendDataToOperationApi('combined', filteredData);
-            break;
-        case 'Subtraction (Privation with inclued events)':
-            response = await sendDataToOperationApi('substraction', filteredData);
-            break;
-        case 'Multichance of independants events (Union)':
-            response = await sendDataToOperationApi('union-indep', filteredData);
-            break;
-        default:
-            console.warn('Unknown operation type:', operationType);
-            response = { details: '', result: '' };
-            break;
+    if (operationType === 'Multichance of incompatibles events (Union)') {
+        const firstRowOdds = newOdds[0]?.slice(0, 2).map(odd => parseFloat(odd)) || [];
+        const dataToSend = [{ odds: firstRowOdds }];
+        console.log('data', dataToSend)
+        response = await sendDataToOperationApi('union-incomp', dataToSend);
+    } else {
+        const filteredData = data
+            .filter((item, index) => 
+                selection.includes(item.id) && 
+                newOdds[index]?.[0] !== undefined 
+            )
+            .map((item, index) => ({
+                ...item,
+                odds: newOdds[index],
+            }));
+
+        console.log('Filtered Data:', filteredData); 
+
+        switch (operationType) {
+            case 'Combined (Intersection with independants events)':
+                response = await sendDataToOperationApi('combined', filteredData);
+                break;
+            case 'Subtraction (Privation with inclued events)':
+                response = await sendDataToOperationApi('substraction', filteredData);
+                break;
+            case 'Multichance of independants events (Union)':
+                response = await sendDataToOperationApi('union-indep', filteredData);
+                break;
+            default:
+                console.warn('Unknown operation type:', operationType);
+                response = { details: '', result: '' };
+                break;
+        }
     }
 
     if (response) {
@@ -262,6 +269,7 @@ const TableInput: React.FC<{
         setOperationResult(response.result);
     }
 };
+
 
 
 
@@ -315,19 +323,20 @@ const TableInput: React.FC<{
         {showOperationType && (
         <div style={{ width: '100%' }}>
             <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-end', gap: '10px', width: '100%' }}>
-                <Select
-                    mt="md"
-                    comboboxProps={{ withinPortal: true }}
-                    data={[
-                        'Combined (Intersection with independants events)',
-                        'Subtraction (Privation with inclued events)',
-                        'Multichance of independants events (Union)',
-                    ]}
-                    placeholder="Pick one"
-                    label="Operation"
-                    onChange={handleOperationChange}
-                    style={{ width: '400px' }}
-                />
+            <Select
+                mt="md"
+                comboboxProps={{ withinPortal: true }}
+                data={[
+                    'Combined (Intersection with independants events)',
+                    'Subtraction (Privation with inclued events)',
+                    'Multichance of independants events (Union)',
+                    'Multichance of incompatibles events (Union)',  // New operation type
+                ]}
+                placeholder="Pick one"
+                label="Operation"
+                onChange={handleOperationChange}
+                style={{ width: '400px' }}
+            />
                 {selectedOperation && (
                     <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-end', gap: '10px' }}>
                         <Button
