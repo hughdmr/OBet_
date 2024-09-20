@@ -1,8 +1,6 @@
-// NOT WORKING 
 export const calculateUnionIndependants = (data: { odds: string[][] }) => {
   console.log('Input data for calculation:', data);
   
-  // Extract and parse odds values
   const odds = data.odds.map((row: string[]) => parseFloat(row[0]));
   console.log('Parsed odds values:', odds);
   
@@ -15,7 +13,6 @@ export const calculateUnionIndependants = (data: { odds: string[][] }) => {
       return { result: '0.00', details: 'No valid odds to calculate.' };
   }
 
-  // Calculate probabilities and union probability
   const probabilities = odds.map(odd => 1 / odd);
   let unionProbability = probabilities[0];
   
@@ -28,7 +25,6 @@ export const calculateUnionIndependants = (data: { odds: string[][] }) => {
   const n = probabilities.length;
   const summationLaTeX = `\\sum_{k=2}^{${n}} (-1)^{k} \\sum_{1 \\leq i_1 < i_2 < \\cdots < i_k \\leq ${n}} P\\left(\\bigcap_{j=1}^k M_{i_j}\\right)`;
 
-  // LaTeX formatting for the probabilities and calculation details
   const probabilitiesLaTeX = probabilities.map((prob, idx) => `P(M_{${idx + 1}})`).join(' + ');
   const details = 
     `\\text{Odd(Union)} = \\frac{1}{P(\\text{Union})} = \\left[ ${probabilitiesLaTeX} - ${summationLaTeX}\\right]^{-1} = ${result}`;
