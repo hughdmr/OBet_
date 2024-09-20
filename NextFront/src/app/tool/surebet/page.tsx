@@ -3,17 +3,29 @@
 import { useState } from 'react';
 import { InputIssuesNumber } from '../../../components/value/IssuesInput';
 import SurebetTable from '../../../components/SurebetTable';
-import classes from '../../../components/SurebetTable.module.css';
 
 export default function Home() {
   const [issuesNumber, setIssuesNumber] = useState(2);
 
   return (
-    <div className={classes.container}>
-      <div className={classes.flexContainer}>
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '20px',
+        height: 'auto',
+      }}
+    >
+      <div
+        style={{
+          display: 'flex',
+          gap: '20px',
+          alignItems: 'flex-end',
+        }}
+      >
         <InputIssuesNumber setIssuesNumber={setIssuesNumber} />
       </div>
-      <div className={classes.scrollable}>
+      <div style={{width: '100%', overflowX: 'auto', maxHeight: '100%'}}>
         <SurebetTable issuesNumber={issuesNumber} />
       </div>
     </div>

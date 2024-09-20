@@ -149,70 +149,50 @@ const TableInput: React.FC<{
     return [originalRow, newRow].filter(Boolean);
   });
 
-  const sendDataToFOAPI = async (fo: string, oddData: any) => {
-    try{
-        const url = `http://localhost:3000/api/fair-odd/${fo}`;
-        console.log(`Sending data to ${url}:`, oddData);
-    
-        const response = await fetch(url, {
-            method: 'POST',
+  const sendDataToFOAPI = async (foType: string, oddData: any) => {
+    try {
+      const url = `http://localhost:3000/api/fair-odd`;
+      console.log(`Sending data to ${url}:`, { odds: oddData, foType });
+  
+      const response = await fetch(url, {
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ odds: oddData }),
+        body: JSON.stringify({ odds: oddData, foType }), // Include foType here
       });
-    
-        console.log('Response Status:', response.status);
-    
-        if (!response.ok) {
-            const errorText = await response.text();
-            console.error('Error response:', errorText);
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-
-        const text = await response.text();
-        if (!text) {
-            console.error('Empty response')
-            return ;
-        }
-    
-        const result = JSON.parse(text);
-        console.log('Result:', result);
-    
-        return result;
-        } catch (error) {
-        console.error('Error during fetch operation:', error);
-        return { result: 'Error occurred while fetching the data.', details: '' };
-        }
+  
+      console.log('Response Status:', response.status);
+  
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Error response:', errorText);
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+  
+      const result = await response.json();
+      console.log('Result:', result);
+  
+      return result;
+    } catch (error) {
+      console.error('Error during fetch operation:', error);
+      return { result: 'Error occurred while fetching the data.', details: '' };
+    }
   };
-
+  
   const handleFOCalculate = async () => {
-
     const oddsData = data.map(row => row.odds.map(odd => parseFloat(odd)));
   
     console.log('Odds Data:', oddsData);
-
-    let response;
-    
-    switch (foType) {
-        case 'MPTO':
-            response = await sendDataToFOAPI('mpto', oddsData);
-            break;
-      
-        case 'EM':
-            response = await sendDataToFOAPI('em', oddsData);
-            break;
-
-        default:
-          console.warn('Unknown fo type:', foType);
-          break;
-    }
-
+  
+    const response = await sendDataToFOAPI(foType!.toLowerCase(), oddsData); // Pass foType directly
+  
     if (response) {
-        setNewOdds(response.fairOdds);
-        setShowNewRows(true); 
+      setNewOdds(response.fairOdds);
+      setShowNewRows(true); 
     }
-};
+  };
+  
 
   const sendDataToOperationApi = async (operation: string, filteredData: any) => {
     try {
