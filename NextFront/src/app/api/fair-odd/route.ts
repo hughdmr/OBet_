@@ -1,23 +1,11 @@
 import { NextResponse } from 'next/server';
-
-const calculateMPTO = (odds: number[]): number[] => {
-  const n = odds.length;
-  if (n === 1) {
-    return odds;
-  }
-
-  const reciprocalSum = odds.reduce((sum, odd) => sum + 1 / odd, 0) - 1;
-
-  return odds.map(odd => 
-    parseFloat(((n * odd) / (n - reciprocalSum * odd)).toFixed(2))
-  );
-};
+import { calculateEM } from './em';
+import { calculateMPTO } from './mpto';
 
 export async function POST(req: Request) {
   try {
-    console.log('hey')
     const body = await req.json();
-    const { odds } = body;
+    const { foType, odds } = body; // Extract foType from the body
 
     if (!Array.isArray(odds) || odds.some(row => !Array.isArray(row) || row.some(isNaN)) || odds.length < 1 || odds[0].length < 1) {
       return NextResponse.json(
@@ -26,12 +14,23 @@ export async function POST(req: Request) {
       );
     }
 
-    const fairOdds = odds.map(row => calculateMPTO(row));
-    console.log('calculated')
+    let fairOdds;
 
+    if (foType === 'mpto') {
+      fairOdds = odds.map(row => calculateMPTO(row)); // Perform MPTO calculation
+    } else if (foType === 'em') {
+      fairOdds = odds.map(row => calculateEM(row)); // Perform EM calculation
+    } else {
+      return NextResponse.json(
+        { error: 'Invalid calculation type.' },
+        { status: 400 }
+      );
+    }
+
+    console.log('Calculated fair odds:', fairOdds);
     return NextResponse.json({ fairOdds }, { status: 200 });
   } catch (error) {
-    console.log(error)
+    console.error('Error in API:', error);
     return NextResponse.json(
       { error: 'An error occurred while processing your request.' },
       { status: 500 }
