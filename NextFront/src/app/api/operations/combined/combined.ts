@@ -20,7 +20,7 @@ export const calculateMultiplication = (data: { odds: string[][] }) => {
       \\left[ ${oddsLaTeX} \\right]^{-1} = 
       \\left[ ${oddsValuesLaTeX} \\right]^{-1} = ${combinedOdd}
     `;
-    const resultLaTeX = `\\text{Combined Odd} = ${combinedOdd}`;
+    const resultLaTeX = `\\text{Combined Fair Odd} = ${combinedOdd}`;
     console.log('Calculation details:', details);
     return { result: resultLaTeX, details };
   };

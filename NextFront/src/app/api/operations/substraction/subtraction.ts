@@ -38,7 +38,7 @@ export const calculateSubtraction = (data: { odds: string[][] }) => {
       \\left[ ${reciprocalsValuesLaTeX} \\right]^{-1} = ${resultFormatted}`;
 
     console.log('Calculation details:', details);
-    const resultLaTeX = `\\text{Subtraction Odd} = ${resultFormatted}`
+    const resultLaTeX = `\\text{Subtraction Fair Odd} = ${resultFormatted}`
     return { result: resultLaTeX, details };
 };
 

@@ -25,7 +25,7 @@ export const calculateUnionIncompatibles = (data: { odds: string[][] }) => {
       `\\text{Odd(Union)} = \\frac{1}{P(\\text{Union})} = \\left[ ${probabilitiesLaTeX} \\right]^{-1} = ${result}`;
   
     console.log('Calculation details:', details);
-    const resultLaTeX = `\\text{Multichance Odd} = ${result}`;
+    const resultLaTeX = `\\text{Multichance Fair Odd} = ${result}`;
     
     return { result: resultLaTeX, details };
 };
