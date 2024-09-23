@@ -1,21 +1,39 @@
 import React, { useState, useEffect } from 'react';
-import { Table, TextInput, Checkbox, Button, Select } from '@mantine/core';
+import { Table, Text, TextInput, Checkbox, Button, Select } from '@mantine/core';
 import cx from 'clsx';
 // @ts-ignore
 import MathJax from 'react-mathjax2';
 import styles from './ValueInputs.module.css';
 
+const calculateTRJ = (odds: string[]) => {
+  const sumInverse = odds.reduce((sum, odd) => sum + 1 / parseFloat(odd), 0);
+  const trj = 100 / sumInverse;
+  return trj.toFixed(1); // Return TRJ with 2 decimal places
+};
+
 const TableInput: React.FC<{
   issuesNumber: number;
   betNumber: number;
 }> = ({ issuesNumber, betNumber}) => {
-  const [data, setData] = useState(() =>
+  
+  type DataType = {
+    id: string;
+    match: string;
+    odds: string[]; // odds should always be a string[]
+    newTextField: string;
+    trj: string;
+  };
+
+  const [data, setData] = useState<DataType[]>(() =>
     Array.from({ length: betNumber }, (_, index) => ({
       id: (index + 1).toString(),
       match: `Match ${index + 1}`,
-      odds: Array.from({ length: issuesNumber }, () => issuesNumber.toString()),
+      odds: Array.from({ length: issuesNumber }, () => issuesNumber.toString()), // Set odds to issuesNumber as a string
+      newTextField: 'TRJ',
+      trj: calculateTRJ(Array.from({ length: issuesNumber }, () => issuesNumber.toString())), // Initialize TRJ with issuesNumber as odds
     }))
   );
+  
 
   const [selection, setSelection] = useState<string[]>([]);
   const [showNewRows, setShowNewRows] = useState(false);
@@ -26,26 +44,32 @@ const TableInput: React.FC<{
   const [operationResult, setOperationResult] = useState<string | null>(null);
   const [operationType, setOperationType] = useState<string | null>(null);
   const [foType, setFOType] = useState<string | null>('MPTO');
+  const [trjValues, setTRJValues] = useState<string[]>([]); // Add this line
 
 
   useEffect(() => {
     const initialData = Array.from({ length: betNumber }, (_, index) => ({
       id: (index + 1).toString(),
       match: `Match ${index + 1}`,
-      odds: Array.from({ length: issuesNumber }, () => issuesNumber.toString()),
+      odds: Array.from({ length: issuesNumber }, () => issuesNumber.toString()), // Set odds to issuesNumber as a string
+      newTextField: 'TRJ',
+      trj: calculateTRJ(Array.from({ length: issuesNumber }, () => issuesNumber.toString())), // Initialize TRJ with issuesNumber
     }));
-  
+
     setData(initialData);
     setSelection(initialData.map(item => item.id));
     setShowNewRows(false);
     setShowOperationType(false);
     setOperationType(null);
     setCalculationDetails('');
-  }, [betNumber, issuesNumber]);  
+    handleTRJCalculate();
+  }, [betNumber, issuesNumber]);
 
   useEffect(() => {
     setCalculationDetails('');
   }, [operationType]);
+
+
 
   const handleInputChange = (id: string, index: number, value: string) => {
     setData((prevData) =>
@@ -54,6 +78,7 @@ const TableInput: React.FC<{
           ? {
               ...item,
               odds: item.odds.map((odd, i) => (i === index ? value : odd)),
+              trj: calculateTRJ(item.odds.map((odd, i) => (i === index ? value : odd))),
             }
           : item
       )
@@ -69,6 +94,7 @@ const TableInput: React.FC<{
       )
     );
   };
+  
 
   const handleOperationChange = (value: string | null) => {
     setSelectedOperation(value);
@@ -114,8 +140,17 @@ const TableInput: React.FC<{
             />
           </Table.Td>
         ))}
+        <Table.Td className={styles.tdInput}>
+        <Text style={{ width: '100%' }}>
+        {item.trj} %
+        </Text>
+        </Table.Td>
       </Table.Tr>
     );
+
+    const newTRJ = newOdds[matchIndex]?.length
+      ? calculateTRJ(newOdds[matchIndex])
+      : '';
   
     const newRow = showNewRows ? (
       <Table.Tr key={`new-${item.id}`} className={styles.nonEditableRow}>
@@ -141,8 +176,13 @@ const TableInput: React.FC<{
               readOnly
               style={{ width: '100%' }}
             />
-          </Table.Td>
-        ))}
+             </Table.Td>
+         ))}
+        <Table.Td className={styles.tdInput}>
+        <Text style={{ width: '100%' }}>
+          {newTRJ} % {/* Display TRJ value */}
+        </Text>
+      </Table.Td>
       </Table.Tr>
     ) : null;
   
@@ -181,17 +221,34 @@ const TableInput: React.FC<{
   };
   
   const handleFOCalculate = async () => {
+    // Ensure odds are numbers
     const oddsData = data.map(row => row.odds.map(odd => parseFloat(odd)));
   
     console.log('Odds Data:', oddsData);
   
-    const response = await sendDataToFOAPI(foType!.toLowerCase(), oddsData); // Pass foType directly
+    // Call the API and pass foType directly
+    const response = await sendDataToFOAPI(foType!.toLowerCase(), oddsData);
   
     if (response) {
-      setNewOdds(response.fairOdds);
-      setShowNewRows(true); 
+      // Calculate TRJ using the original odds
+      const trjValues = response.fairOdds.map((oddsForMatch: string[]) => 
+        calculateTRJ(oddsForMatch)  // Use original odds for TRJ calculation
+      );
+  
+      // Format the odds to have 2 decimal places for display
+      const updatedOdds = response.fairOdds.map((oddsForMatch: string[]) => 
+        oddsForMatch.map(odd => parseFloat(odd).toFixed(2)) // Format each odd for display
+      );
+  
+      // Update the state with new odds and TRJ
+      setNewOdds(updatedOdds);
+      setShowNewRows(true);
+      setTRJValues(trjValues.map((trj: any) => parseFloat(trj).toFixed(2))); // Format TRJ for display
     }
   };
+  
+  
+  
   
 
   const sendDataToOperationApi = async (operation: string, filteredData: any) => {
@@ -271,6 +328,11 @@ const TableInput: React.FC<{
 };
 
 
+const handleTRJCalculate = async () => {
+  const allOdds = data.map((row) => row.odds);
+  console.log('All Odds:', allOdds);
+};
+
 
 
     return (
@@ -291,6 +353,7 @@ const TableInput: React.FC<{
                 {Array.from({ length: issuesNumber }, (_, index) => (
                   <Table.Th key={index} className={styles.thOdd}>Odd {index + 1}</Table.Th>
                 ))}
+                <Table.Th className={styles.thTRJ}>TRJ</Table.Th>
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>
