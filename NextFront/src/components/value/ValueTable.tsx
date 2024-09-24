@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Text, TextInput, Checkbox, Button, Select } from '@mantine/core';
+import { Table, Text, TextInput, Checkbox, Button, Select, Tooltip, Flex } from '@mantine/core';
 import cx from 'clsx';
 // @ts-ignore
 import MathJax from 'react-mathjax2';
@@ -14,8 +14,8 @@ const calculateTRJ = (odds: string[]) => {
 const TableInput: React.FC<{
   issuesNumber: number;
   betNumber: number;
-}> = ({ issuesNumber, betNumber}) => {
-  
+}> = ({ issuesNumber, betNumber }) => {
+
   type DataType = {
     id: string;
     match: string;
@@ -33,7 +33,7 @@ const TableInput: React.FC<{
       trj: calculateTRJ(Array.from({ length: issuesNumber }, () => issuesNumber.toString())), // Initialize TRJ with issuesNumber as odds
     }))
   );
-  
+
 
   const [selection, setSelection] = useState<string[]>([]);
   const [showNewRows, setShowNewRows] = useState(false);
@@ -76,10 +76,10 @@ const TableInput: React.FC<{
       prevData.map((item) =>
         item.id === id
           ? {
-              ...item,
-              odds: item.odds.map((odd, i) => (i === index ? value : odd)),
-              trj: calculateTRJ(item.odds.map((odd, i) => (i === index ? value : odd))),
-            }
+            ...item,
+            odds: item.odds.map((odd, i) => (i === index ? value : odd)),
+            trj: calculateTRJ(item.odds.map((odd, i) => (i === index ? value : odd))),
+          }
           : item
       )
     );
@@ -94,7 +94,7 @@ const TableInput: React.FC<{
       )
     );
   };
-  
+
 
   const handleOperationChange = (value: string | null) => {
     setSelectedOperation(value);
@@ -112,11 +112,11 @@ const TableInput: React.FC<{
 
   const toggleAll = () =>
     setSelection((current) => (current.length === data.length ? [] : data.map((item) => item.id)));
-  
+
   const rows = data.flatMap((item, matchIndex) => {
     const selected = selection.includes(item.id);
     const isHighlight = operationType !== null && selected;
-  
+
     const originalRow = (
       <Table.Tr key={item.id} className={cx({ [styles.rowSelected]: selected })}>
         <Table.Td>
@@ -141,9 +141,9 @@ const TableInput: React.FC<{
           </Table.Td>
         ))}
         <Table.Td className={styles.tdInput}>
-        <Text style={{ width: '100%' }}>
-        {item.trj} %
-        </Text>
+          <Text style={{ width: '100%' }}>
+            {item.trj} %
+          </Text>
         </Table.Td>
       </Table.Tr>
     );
@@ -151,7 +151,7 @@ const TableInput: React.FC<{
     const newTRJ = newOdds[matchIndex]?.length
       ? calculateTRJ(newOdds[matchIndex])
       : '';
-  
+
     const newRow = showNewRows ? (
       <Table.Tr key={`new-${item.id}`} className={styles.nonEditableRow}>
         <Table.Td />
@@ -164,8 +164,8 @@ const TableInput: React.FC<{
           />
         </Table.Td>
         {newOdds[matchIndex]?.map((odd, index) => (
-          <Table.Td 
-            key={`new-${item.id}-${index}`} 
+          <Table.Td
+            key={`new-${item.id}-${index}`}
             className={cx(styles.tdInput, {
               [styles.highlightOdd1]: index === 0 && isHighlight
             })}
@@ -176,16 +176,16 @@ const TableInput: React.FC<{
               readOnly
               style={{ width: '100%' }}
             />
-             </Table.Td>
-         ))}
+          </Table.Td>
+        ))}
         <Table.Td className={styles.tdInput}>
-        <Text style={{ width: '100%' }}>
-          {newTRJ} % {/* Display TRJ value */}
-        </Text>
-      </Table.Td>
+          <Text style={{ width: '100%' }}>
+            {newTRJ} % {/* Display TRJ value */}
+          </Text>
+        </Table.Td>
       </Table.Tr>
     ) : null;
-  
+
     return [originalRow, newRow].filter(Boolean);
   });
 
@@ -193,7 +193,7 @@ const TableInput: React.FC<{
     try {
       const url = `http://localhost:3000/api/fair-odd`;
       console.log(`Sending data to ${url}:`, { odds: oddData, foType });
-  
+
       const response = await fetch(url, {
         method: 'POST',
         headers: {
@@ -201,61 +201,61 @@ const TableInput: React.FC<{
         },
         body: JSON.stringify({ odds: oddData, foType }), // Include foType here
       });
-  
+
       console.log('Response Status:', response.status);
-  
+
       if (!response.ok) {
         const errorText = await response.text();
         console.error('Error response:', errorText);
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
-  
+
       const result = await response.json();
       console.log('Result:', result);
-  
+
       return result;
     } catch (error) {
       console.error('Error during fetch operation:', error);
       return { result: 'Error occurred while fetching the data.', details: '' };
     }
   };
-  
+
   const handleFOCalculate = async () => {
     // Ensure odds are numbers
     const oddsData = data.map(row => row.odds.map(odd => parseFloat(odd)));
-  
+
     console.log('Odds Data:', oddsData);
-  
+
     // Call the API and pass foType directly
     const response = await sendDataToFOAPI(foType!.toLowerCase(), oddsData);
-  
+
     if (response) {
       // Calculate TRJ using the original odds
-      const trjValues = response.fairOdds.map((oddsForMatch: string[]) => 
+      const trjValues = response.fairOdds.map((oddsForMatch: string[]) =>
         calculateTRJ(oddsForMatch)  // Use original odds for TRJ calculation
       );
-  
+
       // Format the odds to have 2 decimal places for display
-      const updatedOdds = response.fairOdds.map((oddsForMatch: string[]) => 
+      const updatedOdds = response.fairOdds.map((oddsForMatch: string[]) =>
         oddsForMatch.map(odd => parseFloat(odd).toFixed(2)) // Format each odd for display
       );
-  
+
       // Update the state with new odds and TRJ
       setNewOdds(updatedOdds);
       setShowNewRows(true);
       setTRJValues(trjValues.map((trj: any) => parseFloat(trj).toFixed(2))); // Format TRJ for display
     }
   };
-  
-  
-  
-  
+
+
+
+
 
   const sendDataToOperationApi = async (operation: string, filteredData: any) => {
     try {
       const url = `http://localhost:3000/api/operations/${operation}`;
       console.log(`Sending data to ${url}:`, filteredData);
-  
+
       const response = await fetch(url, {
         method: 'POST',
         headers: {
@@ -263,18 +263,18 @@ const TableInput: React.FC<{
         },
         body: JSON.stringify({ odds: filteredData.map((item: any) => item.odds) }),
       });
-  
+
       console.log('Response Status:', response.status);
-  
+
       if (!response.ok) {
         const errorText = await response.text();
         console.error('Error response:', errorText);
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
-  
+
       const jsonResponse = await response.json();
       console.log('Response JSON:', jsonResponse);
-  
+
       return jsonResponse;
     } catch (error) {
       console.error('Error during fetch operation:', error);
@@ -287,55 +287,55 @@ const TableInput: React.FC<{
     let response;
 
     if (operationType === 'Multichance of incompatibles events (Union)') {
-        const firstRowOdds = newOdds[0]?.slice(0, 2).map(odd => parseFloat(odd)) || [];
-        const dataToSend = [{ odds: firstRowOdds }];
-        console.log('data', dataToSend)
-        response = await sendDataToOperationApi('union-incomp', dataToSend);
+      const firstRowOdds = newOdds[0]?.slice(0, 2).map(odd => parseFloat(odd)) || [];
+      const dataToSend = [{ odds: firstRowOdds }];
+      console.log('data', dataToSend)
+      response = await sendDataToOperationApi('union-incomp', dataToSend);
     } else {
-        const filteredData = data
-            .filter((item, index) => 
-                selection.includes(item.id) && 
-                newOdds[index]?.[0] !== undefined 
-            )
-            .map((item, index) => ({
-                ...item,
-                odds: newOdds[index],
-            }));
+      const filteredData = data
+        .filter((item, index) =>
+          selection.includes(item.id) &&
+          newOdds[index]?.[0] !== undefined
+        )
+        .map((item, index) => ({
+          ...item,
+          odds: newOdds[index],
+        }));
 
-        console.log('Filtered Data:', filteredData); 
+      console.log('Filtered Data:', filteredData);
 
-        switch (operationType) {
-            case 'Combined (Intersection with independants events)':
-                response = await sendDataToOperationApi('combined', filteredData);
-                break;
-            case 'Subtraction (Privation with inclued events)':
-                response = await sendDataToOperationApi('substraction', filteredData);
-                break;
-            case 'Multichance of independants events (Union)':
-                response = await sendDataToOperationApi('union-indep', filteredData);
-                break;
-            default:
-                console.warn('Unknown operation type:', operationType);
-                response = { details: '', result: '' };
-                break;
-        }
+      switch (operationType) {
+        case 'Combined (Intersection with independants events)':
+          response = await sendDataToOperationApi('combined', filteredData);
+          break;
+        case 'Subtraction (Privation with inclued events)':
+          response = await sendDataToOperationApi('substraction', filteredData);
+          break;
+        case 'Multichance of independants events (Union)':
+          response = await sendDataToOperationApi('union-indep', filteredData);
+          break;
+        default:
+          console.warn('Unknown operation type:', operationType);
+          response = { details: '', result: '' };
+          break;
+      }
     }
 
     if (response) {
-        setCalculationDetails(response.details);
-        setOperationResult(response.result);
+      setCalculationDetails(response.details);
+      setOperationResult(response.result);
     }
-};
+  };
 
 
-const handleTRJCalculate = async () => {
-  const allOdds = data.map((row) => row.odds);
-  console.log('All Odds:', allOdds);
-};
+  const handleTRJCalculate = async () => {
+    const allOdds = data.map((row) => row.odds);
+    console.log('All Odds:', allOdds);
+  };
 
 
 
-    return (
+  return (
     <div>
       <div className={styles.tableContainer}>
         <div className={styles.tableWrapper}>
@@ -363,78 +363,89 @@ const handleTRJCalculate = async () => {
         </div>
       </div>
       <div>
-        <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'flex-end', gap: '10px' }}>
-            <Button
-                mt="md"
-                onClick={() => {
-                    setShowNewRows(true);
-                    setShowOperationType(true);
-                    handleFOCalculate();
-                }}
-            >
-                Calculate Fair Odds
-            </Button>
-            <Select
-                label=""
-                placeholder="Method"
-                data={['MPTO', 'EM']}
-                defaultValue="MPTO"
-                onChange={handleFOChange}
-                style={{ width: '100px' }} 
-            />
-        </div>
+        <Flex
+          direction="row"
+          justify="flex-start"
+          align="flex-end"
+          gap="10px"
+        >
+          <Button
+            mt="md"
+            onClick={() => {
+              setShowNewRows(true);
+              setShowOperationType(true);
+              handleFOCalculate();
+            }}
+          >
+            Calculate Fair Odds
+          </Button>
+          <Select
+            label=""
+            placeholder="Method"
+            data={['MPTO', 'EM']}
+            defaultValue="MPTO"
+            onChange={handleFOChange}
+            style={{ width: '100px' }}
+          />
+        </Flex>
+
         {showOperationType && (
-        <div style={{ width: '100%' }}>
-            <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-end', gap: '10px', width: '100%' }}>
+          <Flex direction="row" align="flex-end" gap="10px" style={{ width: '100%' }}>
             <Select
-                mt="md"
-                comboboxProps={{ withinPortal: true }}
-                data={[
-                    'Combined (Intersection with independants events)',
-                    'Subtraction (Privation with inclued events)',
-                    'Multichance of independants events (Union)',
-                    'Multichance of incompatibles events (Union)',  // New operation type
-                ]}
-                placeholder="Pick one"
-                label="Operation"
-                onChange={handleOperationChange}
-                style={{ width: '400px' }}
+              mt="md"
+              comboboxProps={{ withinPortal: true }}
+              data={[
+                'Combined (Intersection with independants events)',
+                'Subtraction (Privation with included events)',
+                'Multichance of independants events (Union)',
+                'Multichance of incompatibles events (Union)', // New operation type
+              ]}
+              placeholder="Pick one"
+              label="Operation"
+              onChange={handleOperationChange}
+              style={{ width: '400px' }}
             />
-                {selectedOperation && (
-                    <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-end', gap: '10px' }}>
-                        <Button
-                        mt="md"
-                        onClick={handleOperationCalculate}
-                        style={{ whiteSpace: 'nowrap' }}
-                        >
-                        Calculate Operation
-                        </Button>
+            {selectedOperation && (
+              <Flex direction="row" align="flex-end" gap="10px">
+                <Button mt="md" onClick={handleOperationCalculate} style={{ whiteSpace: 'nowrap' }}>
+                  Calculate Operation
+                </Button>
 
-                        {calculationDetails && (
-                        <div style={{ marginBottom: '-5px', marginLeft: '50px', border: '2px solid green', paddingLeft: '10px', paddingRight: '10px'}}> {/* Add margin to slightly lift the result */}
-                            <MathJax.Context input='tex'>
-                            <MathJax.Node>{operationResult}</MathJax.Node>
-                            </MathJax.Context>
-                        </div>
-                        )}
+                {calculationDetails && (
+                  <Tooltip
+                    label={
+                      <MathJax.Context input="tex">
+                        <MathJax.Node>{calculationDetails}</MathJax.Node>
+                      </MathJax.Context>
+                    }
+                    withArrow
+                    position="bottom"
+                    zIndex={1000}
+                  >
+                    <div
+                      style={{
+                        marginLeft: '50px',
+                        border: '2px solid green',
+                        paddingLeft: '10px',
+                        paddingRight: '10px',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      <MathJax.Context input="tex">
+                        <MathJax.Node>{operationResult}</MathJax.Node>
+                      </MathJax.Context>
                     </div>
-                    )}
-                    </div>
-
-            
-            {calculationDetails && (
-            <div style={{ marginTop: '10px', textAlign: 'left'}}>
-                <MathJax.Context input='tex'>                    
-                    <MathJax.Node>{calculationDetails}</MathJax.Node>
-                </MathJax.Context>
-            </div>
+                  </Tooltip>
+                )}
+              </Flex>
             )}
-        </div>
-    )}
-    </div>
-</div>
+          </Flex>
+        )}
 
-);
+      </div>
+    </div>
+
+  );
 };
 
 export default TableInput;
