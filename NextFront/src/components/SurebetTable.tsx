@@ -38,9 +38,9 @@ const SurebetTable: React.FC = () => {
     setOdds(newOdds);
     setStakes(newStakes);
     setTRJ(calculateTRJ(newOdds))
-    
+
     setCheckboxStates((prevStates) => {
-      const newCheckboxStates = Array.from({ length: issuesNumber }, (_, i) => 
+      const newCheckboxStates = Array.from({ length: issuesNumber }, (_, i) =>
         i === selectedRadio ? true : (prevStates[i] ?? false)
       );
 
@@ -97,13 +97,13 @@ const SurebetTable: React.FC = () => {
       setTRJ(calculateTRJ(newOdds));
       return newOdds;
     });
-    
+
     // Prevent modifying stake for the selected fixed column
     if (index === selectedRadio) {
       return; // Exit early if the changed odd is for the fixed column
     }
   };
-  
+
 
   const handleStakeChange = (index: number, value: string) => {
     if (index === selectedRadio) {
@@ -135,7 +135,6 @@ const SurebetTable: React.FC = () => {
       return updatedStates;
     });
   };
-
 
   const calculateBenefit = (index: number) => {
     if (selectedRadio === null) return 0;
@@ -197,9 +196,9 @@ const SurebetTable: React.FC = () => {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', height: 'auto' }}>
-      <div style={{ display: 'flex', gap: '20px', alignItems: 'flex-end'}}>
+      <div style={{ display: 'flex', gap: '20px', alignItems: 'flex-end' }}>
         <InputIssuesNumber setIssuesNumber={setIssuesNumber} />
-        <Text style={{ marginLeft: '20px', paddingBottom: '5px'}}>TRJ: {trj}%</Text>
+        <Text style={{ marginLeft: '20px', paddingBottom: '5px' }}>TRJ: {trj}%</Text>
       </div>
       <div style={{ width: '100%', overflowX: 'auto', maxHeight: '100%' }}>
         <div style={{ overflowX: 'auto', width: 'fit-content' }}>
