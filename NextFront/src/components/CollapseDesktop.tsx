@@ -3,7 +3,7 @@
 import { AppShell, Burger, Group } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import Image from 'next/image';
-import "../../public/optibet-logo.png" 
+import "../../public/favicon.svg" 
 import { NavbarSimple } from './NavBarSimple';
 
 export function CollapseDesktop({ children }: { children: any }) {
@@ -25,10 +25,10 @@ export function CollapseDesktop({ children }: { children: any }) {
           <Burger opened={mobileOpened} onClick={toggleMobile} hiddenFrom="sm" size="sm" />
           <Burger opened={desktopOpened} onClick={toggleDesktop} visibleFrom="sm" size="sm" />
           <Image
-            src="/optibet-logo.png"
-            width={115}
+            src="favicon.svg"
+            width={60}
             height={30}
-            alt="Logo of OptiBet"
+            alt="Logo of OBet"
           />
         </Group>
       </AppShell.Header>

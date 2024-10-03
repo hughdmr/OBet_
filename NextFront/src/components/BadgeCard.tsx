@@ -46,10 +46,9 @@ export function TemplateCard({mockdata}: {mockdata: mockdatatype}) {
   
     return (
       <Card withBorder radius="md" p="md" className={classes.card}>
-        <Card.Section>
+        {/* <Card.Section>
           <Image src={image} alt={title} height={180} />
-        </Card.Section>
-  
+        </Card.Section> */}
         <Card.Section className={classes.section_description} mt="md">
           <Group justify="apart">
             <Text fz="lg" fw={500}>

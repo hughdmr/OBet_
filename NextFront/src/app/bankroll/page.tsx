@@ -9,6 +9,7 @@ export default async function Home() {
     const bets = await fetchBets();
     return (
       <div className="bankroll-container">
+        <h1>Bankroll - Graph & Analysis</h1>
         <ChartData />
         <BetForm />
         <BankrollTable elements={bets}/>

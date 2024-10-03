@@ -60,7 +60,7 @@ export function BetForm() {
 
                 <TextInput
                     label="Amount"
-                    placeholder="45€"
+                    placeholder="45"
                     key={form.key('amount')}
                     {...form.getInputProps('amount')}
                 />

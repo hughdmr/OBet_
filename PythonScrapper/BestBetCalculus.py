@@ -1,8 +1,7 @@
 from itertools import combinations
-from PythonScrapper.ScrapperClass import scrapper_netbet, scrapper_betclic, scrapper_winamax
+from ScrappingUtils import get_data
+from ScrapperClass import scrapper, winamax_data, betclic_data
 import os
-import time
-import json
 
 def calculate_combinates(list, nbr):
     # print(list)
@@ -49,10 +48,6 @@ def main(bookmaker, nbr):
     print(f"[CHARGEMENT] Lancement de l'algorithme d'analyse stochastique... ")
     Match_List = []
     
-    # Time analysis
-    temps = time.time()
-    print(temps)
-    
     if not os.path.exists('./data'):
         os.mkdir('./data')
         
@@ -68,22 +63,12 @@ def main(bookmaker, nbr):
     print(bookmaker_name)
     
     # Scrapp only if the last scrap last for more than one minute
-    if temps-temps_max > 100 or bookmaker_name != bookmaker:
-        
-        if bookmaker == "betclic":
-            Match_List = scrapper_betclic()
-        elif bookmaker == "netbet":
-            Match_List = scrapper_netbet()
-        elif bookmaker == "winamax":
-            Match_List = scrapper_winamax()
-        else:
-            raise ValueError("Le bookmaker indiqué n'est pas configuré")
-                
-        if os.path.exists(f"./data/{bookmaker}-{temps_max}.json"):
-            os.remove(f"./data/{bookmaker}-{temps_max}.json")
+    if bookmaker == "betclic":
+        Match_List = get_data(scrapper(betclic_data))
+    elif bookmaker == "winamax":
+        Match_List = get_data(scrapper(winamax_data))
     else:
-        with open(f"./data/{bookmaker}-{temps_max}.json", "r") as f:
-            Match_List = json.load(f)
+        raise ValueError("Le bookmaker indiqué n'est pas configuré")
     
     # All possible match combinations
     combinaisons = calcul_combinaisons(Match_List, nbr)
@@ -126,3 +111,6 @@ def main(bookmaker, nbr):
     
     # Renvoi fonction
     return taux_conversion + matchs_jouer
+
+if __name__ == '__main__':
+    main("winamax", 3)

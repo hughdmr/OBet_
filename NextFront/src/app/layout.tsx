@@ -12,7 +12,7 @@ import { CollapseDesktop } from "@/components/CollapseDesktop";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "OptiBet companion",
+  title: "OBet companion",
   description: "The bet companion",
 };
 

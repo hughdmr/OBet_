@@ -45,6 +45,28 @@ export async function fetchBets() {
   
 }
 
+export async function fetchBankroll() {
+  noStore()
+  let data = await fetchBets()
+  var cumulate_amount = 0
+
+  const bankroll_array = data.reverse().map(element => {
+    if (element.status == 'won') {
+      cumulate_amount += parseInt(element.amount) * element.cote
+    }
+    else if (element.status == 'lost') {
+      cumulate_amount -= parseInt(element.amount)
+    }
+    return {
+        date: element.date,
+        amount: cumulate_amount,
+    };
+  })
+
+  bankroll_array.unshift({date: bankroll_array[0].date, amount: 0})
+  return bankroll_array
+}
+
 export async function fetchFilteredBets(query: string) {
   noStore()
   try {
@@ -82,5 +104,3 @@ export async function fetchFilteredBets(query: string) {
     throw new Error('Failed to fetch bets.');
   }
 }
-
-

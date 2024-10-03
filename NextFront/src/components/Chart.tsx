@@ -1,7 +1,8 @@
 import { AreaChart } from '@mantine/charts';
-import { data } from './ChartData';
+import { fetchBankroll } from '@/scripts/data';
 
-export function ChartData() {
+export async function ChartData() {
+  const data = await fetchBankroll();
   return (
     <AreaChart
       h={400}
@@ -11,9 +12,7 @@ export function ChartData() {
       unit="€"
       tooltipAnimationDuration={200}
       series={[
-        { name: 'Winamax', color: 'indigo.6' },
-        { name: 'Unibet', color: 'blue.6' },
-        { name: 'Betclic', color: 'teal.6' },
+        { name: 'amount', color: 'indigo.6' }
       ]}
       curveType="monotone"
     />
