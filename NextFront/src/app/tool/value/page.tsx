@@ -4,8 +4,8 @@ import { useState } from 'react';
 import { InputKellyOdd, InputKellyFOdd } from '../../../components/value/KellysInput';
 import { CalculKellyButton } from '../../../components/value/KellysCalcul';
 import { InputBetNumber } from '../../../components/value/BetsInput';
-import { InputIssuesNumber } from '../../../components/value/IssuesInput';
-import TableInput from '../../../components/value/ValueTable';
+import { InputIssuesNumber } from '../../../components/IssuesInput';
+import ValueTable from '../../../components/value/ValueTable';
 // @ts-ignore
 import MathJax from 'react-mathjax2';
 
@@ -25,7 +25,7 @@ export default function Home() {
         <InputIssuesNumber setIssuesNumber={setIssuesNumber} />
       </div>
       <div style={{ width: '100%', overflowX: 'auto', maxHeight: '100%'}}>
-        <TableInput betNumber={betNumber} issuesNumber={issuesNumber}/>
+        <ValueTable betNumber={betNumber} issuesNumber={issuesNumber}/>
       </div>
       <div style={{ display: 'flex', gap: '20px', alignItems: 'flex-end'}}>
         <InputKellyOdd setKellyOdd={setKellyOdd}/>
