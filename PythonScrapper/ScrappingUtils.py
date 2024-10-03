@@ -56,10 +56,10 @@ def save_data(matches, bookmaker):
 def get_soup(url):
     chrome_options = Options()
     chrome_options.add_argument("--headless") 
-    chrome_options.add_argument('--disable-dev-shm-usage') 
-    
-    hub_url = "http://selenium:4444"
-    driver = webdriver.Remote(command_executor=hub_url, options=chrome_options)
+    driver = webdriver.Chrome(options=chrome_options)
+    # chrome_options.add_argument('--disable-dev-shm-usage') 
+    # hub_url = "http://selenium:4444"
+    # driver = webdriver.Remote(command_executor=hub_url, options=chrome_options)
     
     driver.get(url)
     print(f"[{url.split('.')[1].upper()}] Driver is connected...")

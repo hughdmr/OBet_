@@ -3,10 +3,13 @@ import classes from '../../components/BadgeCard.module.css';
 
 export default function Home() {
     return (
-      <div className={classes.container}>
-        <ValueCard/>
-        <SurebetCard/>
-        <FreebetCard/>
+      <div>
+        <h1>Betting Tools</h1>
+        <div className={classes.container}>
+            <ValueCard/>
+            <SurebetCard/>
+            <FreebetCard/>
+      </div>
     </div>
     );
   }
