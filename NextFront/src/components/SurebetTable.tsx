@@ -1,20 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Text, TextInput, Radio, Checkbox, Flex } from '@mantine/core';
-import { InputIssuesNumber } from './value/IssuesInput';
+import { InputIssuesNumber } from './IssuesInput';
+import { calculateTRJSurebet} from './utils';
 
-const calculateTRJ = (odds: string[]) => {
-  const sumInverse = odds.reduce((sum, odd) => sum + 1 / parseFloat(odd || '1'), 0); // Prevent division by zero
-  const trj = 100 / sumInverse;
-  return trj.toFixed(1); // Return TRJ with 1 decimal place
-};
-
-const SurebetTable: React.FC = () => {
+const SurebetTable = () => {  
   const [selectedRadio, setSelectedRadio] = useState<number>(0);
   const [issuesNumber, setIssuesNumber] = useState(2);
   const [checkboxStates, setCheckboxStates] = useState<boolean[]>([]);
   const [odds, setOdds] = useState<string[]>([]);
   const [stakes, setStakes] = useState<string[]>([]);
-  const [trj, setTRJ] = useState<string>('100%'); // Add this line
+  const [trj, setTRJ] = useState<string>('100%');
 
   function usePrevious<T>(value: T): T | undefined {
     const ref = React.useRef<T>();
@@ -37,7 +32,7 @@ const SurebetTable: React.FC = () => {
 
     setOdds(newOdds);
     setStakes(newStakes);
-    setTRJ(calculateTRJ(newOdds))
+    setTRJ(calculateTRJSurebet(newOdds))
 
     setCheckboxStates((prevStates) => {
       const newCheckboxStates = Array.from({ length: issuesNumber }, (_, i) =>
@@ -62,7 +57,7 @@ const SurebetTable: React.FC = () => {
       stakes: stakes.map((s) => parseFloat(s)),
       selectedRadio: selectedRadio,
       shareChecked: checkboxStates,
-      trj: trj, // Include trj in the payload
+      trj: trj,
     };
 
     try {
@@ -94,13 +89,12 @@ const SurebetTable: React.FC = () => {
   const handleOddChange = (index: number, value: string) => {
     setOdds((prevOdds) => {
       const newOdds = prevOdds.map((entry, i) => (i === index ? value : entry));
-      setTRJ(calculateTRJ(newOdds));
+      setTRJ(calculateTRJSurebet(newOdds));
       return newOdds;
     });
 
-    // Prevent modifying stake for the selected fixed column
     if (index === selectedRadio) {
-      return; // Exit early if the changed odd is for the fixed column
+      return;
     }
   };
 
@@ -125,7 +119,7 @@ const SurebetTable: React.FC = () => {
 
   const handleCheckboxChange = (index: number) => {
     if (index === selectedRadio) {
-      return; // Prevent toggling the fixed column checkbox
+      return;
     }
 
     setCheckboxStates((prevStates) => {

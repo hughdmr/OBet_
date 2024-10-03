@@ -1,39 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Text, TextInput, Checkbox, Button, Select, Tooltip, Flex } from '@mantine/core';
-import cx from 'clsx';
 // @ts-ignore
 import MathJax from 'react-mathjax2';
-import styles from './ValueInputs.module.css';
+import { calculateTRJValue } from '../utils';
+import { DataType, ValueTableInputs } from '../types';
 
-const calculateTRJ = (odds: string[]) => {
-  const sumInverse = odds.reduce((sum, odd) => sum + 1 / parseFloat(odd), 0);
-  const trj = 100 / sumInverse;
-  return trj.toFixed(1); // Return TRJ with 2 decimal places
-};
-
-const TableInput: React.FC<{
-  issuesNumber: number;
-  betNumber: number;
-}> = ({ issuesNumber, betNumber }) => {
-
-  type DataType = {
-    id: string;
-    match: string;
-    odds: string[]; // odds should always be a string[]
-    newTextField: string;
-    trj: string;
-  };
-
-  const [data, setData] = useState<DataType[]>(() =>
-    Array.from({ length: betNumber }, (_, index) => ({
-      id: (index + 1).toString(),
-      match: `Match ${index + 1}`,
-      odds: Array.from({ length: issuesNumber }, () => issuesNumber.toString()), // Set odds to issuesNumber as a string
-      newTextField: 'TRJ',
-      trj: calculateTRJ(Array.from({ length: issuesNumber }, () => issuesNumber.toString())), // Initialize TRJ with issuesNumber as odds
-    }))
-  );
-
+const ValueTable = ({ issuesNumber, betNumber }: ValueTableInputs) => {  
 
   const [selection, setSelection] = useState<string[]>([]);
   const [showNewRows, setShowNewRows] = useState(false);
@@ -44,32 +16,34 @@ const TableInput: React.FC<{
   const [operationResult, setOperationResult] = useState<string | null>(null);
   const [operationType, setOperationType] = useState<string | null>(null);
   const [foType, setFOType] = useState<string | null>('MPTO');
-  const [trjValues, setTRJValues] = useState<string[]>([]); // Add this line
-
-
-  useEffect(() => {
-    const initialData = Array.from({ length: betNumber }, (_, index) => ({
+  const [TRJValues, setTRJValues] = useState<string[]>([]);
+  const [data, setData] = useState<DataType[]>(() =>
+    Array.from({ length: betNumber }, (_, index) => ({
       id: (index + 1).toString(),
       match: `Match ${index + 1}`,
-      odds: Array.from({ length: issuesNumber }, () => issuesNumber.toString()), // Set odds to issuesNumber as a string
+      odds: Array.from({ length: issuesNumber }, () => issuesNumber.toString()),
       newTextField: 'TRJ',
-      trj: calculateTRJ(Array.from({ length: issuesNumber }, () => issuesNumber.toString())), // Initialize TRJ with issuesNumber
-    }));
+      trj: calculateTRJValue(Array.from({ length: issuesNumber }, () => issuesNumber.toString())),
+    }))
+  );
+  const initialData = Array.from({ length: betNumber }, (_, index) => ({
+    id: (index + 1).toString(),
+    match: `Match ${index + 1}`,
+    odds: Array.from({ length: issuesNumber }, () => issuesNumber.toString()),
+    newTextField: 'TRJ',
+    trj: calculateTRJValue(Array.from({ length: issuesNumber }, () => issuesNumber.toString())),
+  }));
 
-    setData(initialData);
-    setSelection(initialData.map(item => item.id));
+  useEffect(() => {
     setShowNewRows(false);
     setShowOperationType(false);
     setOperationType(null);
     setCalculationDetails('');
     handleTRJCalculate();
-  }, [betNumber, issuesNumber]);
-
-  useEffect(() => {
+    setData(initialData);
+    setSelection(initialData.map(item => item.id));
     setCalculationDetails('');
-  }, [operationType]);
-
-
+  }, [betNumber, issuesNumber, operationType]);
 
   const handleInputChange = (id: string, index: number, value: string) => {
     setData((prevData) =>
@@ -78,7 +52,7 @@ const TableInput: React.FC<{
           ? {
             ...item,
             odds: item.odds.map((odd, i) => (i === index ? value : odd)),
-            trj: calculateTRJ(item.odds.map((odd, i) => (i === index ? value : odd))),
+            trj: calculateTRJValue(item.odds.map((odd, i) => (i === index ? value : odd))),
           }
           : item
       )
@@ -94,7 +68,6 @@ const TableInput: React.FC<{
       )
     );
   };
-
 
   const handleOperationChange = (value: string | null) => {
     setSelectedOperation(value);
@@ -113,81 +86,10 @@ const TableInput: React.FC<{
   const toggleAll = () =>
     setSelection((current) => (current.length === data.length ? [] : data.map((item) => item.id)));
 
-  const rows = data.flatMap((item, matchIndex) => {
-    const selected = selection.includes(item.id);
-    const isHighlight = operationType !== null && selected;
-
-    const originalRow = (
-      <Table.Tr key={item.id} className={cx({ [styles.rowSelected]: selected })}>
-        <Table.Td>
-          <Checkbox className={styles.checkboxChecked} checked={selected} onChange={() => toggleRow(item.id)} />
-        </Table.Td>
-        <Table.Td className={styles.tdInput}>
-          <TextInput
-            type="text"
-            value={item.match}
-            onChange={(e) => handleMatchChange(item.id, e.target.value)}
-            style={{ width: '100%' }}
-          />
-        </Table.Td>
-        {item.odds.map((odd, index) => (
-          <Table.Td key={index} className={styles.tdInput}>
-            <TextInput
-              type="text"
-              value={odd}
-              onChange={(e) => handleInputChange(item.id, index, e.target.value)}
-              style={{ width: '100%' }}
-            />
-          </Table.Td>
-        ))}
-        <Table.Td className={styles.tdInput}>
-          <Text style={{ width: '100%' }}>
-            {item.trj} %
-          </Text>
-        </Table.Td>
-      </Table.Tr>
-    );
-
-    const newTRJ = newOdds[matchIndex]?.length
-      ? calculateTRJ(newOdds[matchIndex])
-      : '';
-
-    const newRow = showNewRows ? (
-      <Table.Tr key={`new-${item.id}`} className={styles.nonEditableRow}>
-        <Table.Td />
-        <Table.Td className={styles.tdInput}>
-          <TextInput
-            type="text"
-            value={`${item.match} FO`}
-            readOnly
-            style={{ width: '100%' }}
-          />
-        </Table.Td>
-        {newOdds[matchIndex]?.map((odd, index) => (
-          <Table.Td
-            key={`new-${item.id}-${index}`}
-            className={cx(styles.tdInput, {
-              [styles.highlightOdd1]: index === 0 && isHighlight
-            })}
-          >
-            <TextInput
-              type="text"
-              value={odd.toString()}
-              readOnly
-              style={{ width: '100%' }}
-            />
-          </Table.Td>
-        ))}
-        <Table.Td className={styles.tdInput}>
-          <Text style={{ width: '100%' }}>
-            {newTRJ} % {/* Display TRJ value */}
-          </Text>
-        </Table.Td>
-      </Table.Tr>
-    ) : null;
-
-    return [originalRow, newRow].filter(Boolean);
-  });
+  const handleTRJCalculate = async () => {
+    const allOdds = data.map((row) => row.odds);
+    console.log('All Odds:', allOdds);
+  };
 
   const sendDataToFOAPI = async (foType: string, oddData: any) => {
     try {
@@ -199,7 +101,7 @@ const TableInput: React.FC<{
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ odds: oddData, foType }), // Include foType here
+        body: JSON.stringify({ odds: oddData, foType }),
       });
 
       console.log('Response Status:', response.status);
@@ -221,35 +123,22 @@ const TableInput: React.FC<{
   };
 
   const handleFOCalculate = async () => {
-    // Ensure odds are numbers
     const oddsData = data.map(row => row.odds.map(odd => parseFloat(odd)));
-
     console.log('Odds Data:', oddsData);
-
-    // Call the API and pass foType directly
     const response = await sendDataToFOAPI(foType!.toLowerCase(), oddsData);
 
     if (response) {
-      // Calculate TRJ using the original odds
       const trjValues = response.fairOdds.map((oddsForMatch: string[]) =>
-        calculateTRJ(oddsForMatch)  // Use original odds for TRJ calculation
+        calculateTRJValue(oddsForMatch)
       );
-
-      // Format the odds to have 2 decimal places for display
       const updatedOdds = response.fairOdds.map((oddsForMatch: string[]) =>
-        oddsForMatch.map(odd => parseFloat(odd).toFixed(2)) // Format each odd for display
+        oddsForMatch.map(odd => parseFloat(odd).toFixed(2))
       );
-
-      // Update the state with new odds and TRJ
       setNewOdds(updatedOdds);
       setShowNewRows(true);
-      setTRJValues(trjValues.map((trj: any) => parseFloat(trj).toFixed(2))); // Format TRJ for display
+      setTRJValues(trjValues.map((trj: any) => parseFloat(trj).toFixed(2)));
     }
   };
-
-
-
-
 
   const sendDataToOperationApi = async (operation: string, filteredData: any) => {
     try {
@@ -327,33 +216,104 @@ const TableInput: React.FC<{
     }
   };
 
+  const rows = data.flatMap((item, matchIndex) => {
+    const selected = selection.includes(item.id);
+    const isHighlight = operationType !== null && selected;
 
-  const handleTRJCalculate = async () => {
-    const allOdds = data.map((row) => row.odds);
-    console.log('All Odds:', allOdds);
-  };
-
-
+    const originalRow = (
+      <Table.Tr key={item.id} style={{ backgroundColor: selected ? '#f5f5f5' : undefined }}>
+        <Table.Td>
+          <Checkbox className="checkboxChecked" checked={selected} onChange={() => toggleRow(item.id)} />
+        </Table.Td>
+        <Table.Td style={{ minWidth: '140px', maxWidth: '140px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          <TextInput
+            type="text"
+            value={item.match}
+            onChange={(e) => handleMatchChange(item.id, e.target.value)}
+            style={{ width: '100%' }}
+          />
+        </Table.Td>
+        {item.odds.map((odd, index) => (
+          <Table.Td key={index} style={{ minWidth: '100px', maxWidth: '100px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            <TextInput
+              type="text"
+              value={odd}
+              onChange={(e) => handleInputChange(item.id, index, e.target.value)}
+              style={{ width: '100%' }}
+            />
+          </Table.Td>
+        ))}
+        <Table.Td style={{ minWidth: '100px', maxWidth: '100px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          <Text style={{ width: '100%' }}>
+            {item.trj} %
+          </Text>
+        </Table.Td>
+      </Table.Tr>
+    );
+  
+    const newTRJ = newOdds[matchIndex]?.length ? calculateTRJValue(newOdds[matchIndex]) : '';
+  
+    const newRow = showNewRows ? (
+      <Table.Tr key={`new-${item.id}`} style={{ backgroundColor: '#f0f8f0' }}>
+        <Table.Td />
+        <Table.Td style={{ minWidth: '140px', maxWidth: '140px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          <TextInput
+            type="text"
+            value={`${item.match} FO`}
+            readOnly
+            style={{ width: '100%' }}
+          />
+        </Table.Td>
+        {newOdds[matchIndex]?.map((odd, index) => (
+          <Table.Td
+            key={`new-${item.id}-${index}`}
+            style={{
+              minWidth: '100px',
+              maxWidth: '100px',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+              border: index === 0 && isHighlight ? '2px solid green' : undefined
+            }}
+          >
+            <TextInput
+              type="text"
+              value={odd.toString()}
+              readOnly
+              style={{ width: '100%' }}
+            />
+          </Table.Td>
+        ))}
+        <Table.Td style={{ minWidth: '100px', maxWidth: '100px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          <Text style={{ width: '100%' }}>
+            {newTRJ} %
+          </Text>
+        </Table.Td>
+      </Table.Tr>
+    ) : null;
+  
+    return [originalRow, newRow].filter(Boolean);
+  })
 
   return (
-    <div>
-      <div className={styles.tableContainer}>
-        <div className={styles.tableWrapper}>
-          <Table className={styles.table}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', height: 'auto' }}>
+      <div style={{ overflowX: 'auto', width: '100%' }}>
+        <div style={{ maxHeight: 'calc(100vh - 80px)', overflowY: 'auto' }}>
+          <Table style={{ tableLayout: 'auto', width: 'auto' }}>
             <Table.Thead>
               <Table.Tr>
-                <Table.Th style={{ width: '40px' }} className={styles.checkboxChecked}>
+                <Table.Th style={{ width: '40px', display: 'inline-block', borderColor: '#f5f5f5' }}>
                   <Checkbox
                     onChange={toggleAll}
                     checked={selection.length === data.length}
                     indeterminate={selection.length > 0 && selection.length !== data.length}
                   />
                 </Table.Th>
-                <Table.Th className={styles.thMatches}>Matches</Table.Th>
+                <Table.Th style={{ minWidth: '140px', maxWidth: '140px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Matches</Table.Th>
                 {Array.from({ length: issuesNumber }, (_, index) => (
-                  <Table.Th key={index} className={styles.thOdd}>Odd {index + 1}</Table.Th>
+                  <Table.Th key={index} style={{ minWidth: '100px', maxWidth: '100px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Odd {index + 1}</Table.Th>
                 ))}
-                <Table.Th className={styles.thTRJ}>TRJ</Table.Th>
+                <Table.Th style={{ minWidth: '100px', maxWidth: '100px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>TRJ</Table.Th>
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>
@@ -388,7 +348,7 @@ const TableInput: React.FC<{
             style={{ width: '100px' }}
           />
         </Flex>
-
+  
         {showOperationType && (
           <Flex direction="row" align="flex-end" gap="10px" style={{ width: '100%' }}>
             <Select
@@ -398,7 +358,7 @@ const TableInput: React.FC<{
                 'Combined (Intersection with independants events)',
                 'Subtraction (Privation with included events)',
                 'Multichance of independants events (Union)',
-                'Multichance of incompatibles events (Union)', // New operation type
+                'Multichance of incompatibles events (Union)',
               ]}
               placeholder="Pick one"
               label="Operation"
@@ -410,7 +370,7 @@ const TableInput: React.FC<{
                 <Button mt="md" onClick={handleOperationCalculate} style={{ whiteSpace: 'nowrap' }}>
                   Calculate Operation
                 </Button>
-
+  
                 {calculationDetails && (
                   <Tooltip
                     label={
@@ -441,11 +401,10 @@ const TableInput: React.FC<{
             )}
           </Flex>
         )}
-
       </div>
     </div>
-
   );
-};
-
-export default TableInput;
+  };
+  
+  export default ValueTable;
+  
