@@ -89,7 +89,7 @@ export function ValueCard() {
         parent: 'Tool',
         image:
           'https://www.growthforce.com/hs-fs/hubfs/AdobeStock_513387732%20(1).jpeg?width=800&height=498&name=AdobeStock_513387732%20(1).jpeg',
-        title: 'Value Calculator',
+        title: 'Fair Odds Calculator',
         country: 'Free',
         description:
           'This tool helps with the calcul of bet value, for a lot of type of bet. If you have a bet or boost that seems interesting for you, you write the odds you have on a serious bookmaker such as Pinnacle and it will gives you the fair odd (odd without marge). The tool will indicate you the value of your bet and will gives you an example of the stake you could bet following Kellys criteria.',
@@ -100,7 +100,7 @@ export function ValueCard() {
         ],
         devise: 'The only principle to optibet and win.',
         link: '/tool/value', 
-        label: 'Show details',
+        label: 'Open',
       };
 
   return (
@@ -126,7 +126,7 @@ export function SurebetCard() {
         ],
         devise: 'The Swiss knife to optibet and win.',
         link: '/tool/surebet', 
-        label: 'Show details',
+        label: 'Open',
       };
 
     return (
@@ -141,7 +141,7 @@ export function FreebetCard() {
         parent: 'Tool',
         image:
           'https://images.freeimages.com/images/premium/previews/1566/15661718-money-exchange.jpg',
-        title: 'Freebet Convertor',
+        title: 'Freebet Converter',
         country: 'Premium',
         description:
           'This tool develops a method to convert your freebets, it leads and advices you for implement this method.',
@@ -153,7 +153,7 @@ export function FreebetCard() {
         ],
         devise: 'The essential to optibet and win.',
         link: 'tool/freebet',
-        label: 'Show details',
+        label: 'Open',
       };
 
     return (
