@@ -4,7 +4,7 @@ import { AppShell, Burger, Group } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import Image from 'next/image';
 import "../../public/favicon.svg" 
-import { NavbarSimple } from './NavBarSimple';
+import { Toolbar } from './Toolbar';
 
 export function CollapseDesktop({ children }: { children: any }) {
   const [mobileOpened, { toggle: toggleMobile }] = useDisclosure();
@@ -33,7 +33,7 @@ export function CollapseDesktop({ children }: { children: any }) {
         </Group>
       </AppShell.Header>
       <AppShell.Navbar p="0">
-        <NavbarSimple />
+        <Toolbar />
       </AppShell.Navbar>
       <AppShell.Main>{children}</AppShell.Main>
     </AppShell>
