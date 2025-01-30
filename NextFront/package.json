@@ -8,8 +8,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "seed": "node -r dotenv/config ./src/scripts/seed.js"
-  },
+    "seed": "node -r dotenv/config ./src/scripts/seed.js",
+    "scrape": "bun run src/scripts/scrapers-scorers/bet365.tsx"
+},
   "dependencies": {
     "@mantine/charts": "7.10.0",
     "@mantine/core": "7.10.0",
@@ -23,20 +24,23 @@
     "install": "^0.13.0",
     "moment": "^2.30.1",
     "next": "14.1.3",
+    "puppeteer": "^23.5.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-mathjax2": "^0.0.2",
-    "recharts": "^2.13.0-alpha.4"
+    "recharts": "^2.13.0-alpha.4",
+    "scheduler": "^0.23.2",
+    "ts-node": "^10.9.2"
   },
   "devDependencies": {
     "@types/node": "20.11.26",
-    "@types/react": "18.2.65",
-    "@types/react-dom": "18.2.21",
+    "@types/react": "^18.3.11",
+    "@types/react-dom": "^18.3.0",
     "eslint": "8.57.0",
     "eslint-config-next": "14.1.3",
     "postcss": "^8.4.38",
     "postcss-preset-mantine": "^1.15.0",
     "postcss-simple-vars": "^7.0.1",
-    "typescript": "5.4.2"
+    "typescript": "^5.6.2"
   }
 }

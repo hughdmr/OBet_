@@ -1,6 +1,6 @@
 "use client"
 
-import { DisplayBet } from '@/scripts/definitions';
+import { DisplayBet } from '@/scripts/types';
 import { Table } from '@mantine/core';
 
 export function BankrollTable({elements}:{elements: DisplayBet[]}) {

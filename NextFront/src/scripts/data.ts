@@ -1,6 +1,6 @@
 import { sql } from '@vercel/postgres';
 import { unstable_noStore as noStore } from 'next/cache';
-import { User, TableBet } from './definitions'
+import { User, TableBet } from './types'
 
 const formatCurrency = (amount: number) => {
     return amount.toLocaleString('fr-FR', {
